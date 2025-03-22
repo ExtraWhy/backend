@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
@@ -38,6 +39,7 @@ func (srv *Server) GetHostPortStr() string {
 func (srv *Server) DoRun() error {
 	srv.router = gin.Default()
 	srv.router.GET("/players", getPlayers)
+	srv.router.GET("/players/:id", getPlayerById)
 	srv.router.POST("/players", postPlayers)
 	return srv.router.Run("localhost:8080")
 }
@@ -47,17 +49,27 @@ func getPlayers(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, players)
 }
 
+func getPlayerById(ctx *gin.Context) {
+	id := ctx.Param("id")
+	tmp, _ := strconv.ParseUint(id, 10, 64) //TODO handle error laster
+
+	for _, a := range players {
+		if a.Id == tmp {
+			ctx.IndentedJSON(http.StatusOK, a)
+			return
+		}
+	}
+	errmsg := fmt.Sprintf("Player with id %d does not exists", tmp)
+	ctx.IndentedJSON(http.StatusNotFound, gin.H{"message": errmsg})
+}
+
 func postPlayers(ctx *gin.Context) {
 	var komardjia player.Player
 
 	// Call BindJSON to bind the received JSON to
-	// newAlbum.
 	if err := ctx.BindJSON(&komardjia); err != nil {
-		fmt.Errorf("Failed to add player\r\n")
 		return
 	}
-
-	fmt.Println("Ok , added player")
 	// Add the new album to the slice.
 	players = append(players, komardjia)
 	ctx.IndentedJSON(http.StatusCreated, komardjia)
