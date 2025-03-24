@@ -1,35 +1,25 @@
 package server
 
 import (
+	"casino/rest-backend/db"
 	"casino/rest-backend/player"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
-	"github.com/gin-contrib/cors"
 	"golang.org/x/crypto/acme/autocert"
 )
 
-// todo: temp for testing - remove later
-var players = []player.Player{
-	{Id: 1, Name: "Lubaka F", Money: 123456},
-	{Id: 2, Name: "Lubaka K", Money: 1},
-	{Id: 3, Name: "Kucheto", Money: 5},
-	{Id: 4, Name: "Kalniq", Money: 5},
-	{Id: 5, Name: "Potniq", Money: 5},
-	{Id: 6, Name: "Bavniq", Money: 5},
-	{Id: 7, Name: "Burziq", Money: 5},
-}
-
-// end todo
 type Server struct {
-	Host    string
-	Port    uint16
-	router  *gin.Engine
-	autocrt autocert.Manager //member for certificates with Let's encrypt
+	Host       string
+	Port       uint16
+	router     *gin.Engine
+	autocrt    autocert.Manager //member for certificates with Let's encrypt
+	sqliteconn db.DBconnection
 }
 
 func (srv *Server) SetHostPort(s string, p uint16) {
@@ -42,7 +32,10 @@ func (srv *Server) GetHostPortStr() string {
 }
 
 func (srv *Server) DoRun() error {
+	srv.sqliteconn.Init()
 	srv.router = gin.Default()
+
+	defer srv.sqliteconn.Deinit()
 
 	srv.router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend
@@ -50,21 +43,22 @@ func (srv *Server) DoRun() error {
 		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
 	}))
 
-	srv.router.GET("/players", getPlayers)
-	srv.router.GET("/players/:id", getPlayerById)
-	srv.router.POST("/players", postPlayers)
+	srv.router.GET("/players", srv.getPlayers)
+	srv.router.GET("/players/:id", srv.getPlayerById)
+	srv.router.POST("/players", srv.postPlayers)
 	return srv.router.Run("localhost:8080")
 }
 
 // priv
-func getPlayers(ctx *gin.Context) {
-	ctx.IndentedJSON(http.StatusOK, players)
+func (srv *Server) getPlayers(ctx *gin.Context) {
+	p := srv.sqliteconn.DisplayPlayers()
+	ctx.IndentedJSON(http.StatusOK, p)
 }
 
-func getPlayerById(ctx *gin.Context) {
+func (srv *Server) getPlayerById(ctx *gin.Context) {
 	id := ctx.Param("id")
 	tmp, _ := strconv.ParseUint(id, 10, 64) //TODO handle error laster
-
+	players := srv.sqliteconn.DisplayPlayers()
 	for _, a := range players {
 		if a.Id == tmp {
 			ctx.IndentedJSON(http.StatusOK, a)
@@ -75,7 +69,7 @@ func getPlayerById(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusNotFound, gin.H{"message": errmsg})
 }
 
-func findById(p *player.Player) bool {
+func findById(p *player.Player, players []player.Player) bool {
 	for _, id := range players {
 		if id.Id == p.Id {
 			return true
@@ -84,21 +78,22 @@ func findById(p *player.Player) bool {
 	return false
 }
 
-func postPlayers(ctx *gin.Context) {
+func (srv *Server) postPlayers(ctx *gin.Context) {
 	var komardjia player.Player
 
 	// Call BindJSON to bind the received JSON to
 	if err := ctx.BindJSON(&komardjia); err != nil {
 		return
 	}
-
-	if findById(&komardjia) {
+	p := srv.sqliteconn.DisplayPlayers()
+	if findById(&komardjia, p) {
 		errmsg := fmt.Sprintf("Player with id %d does  exists", komardjia.Id)
 		ctx.IndentedJSON(http.StatusNotFound, gin.H{"message": errmsg})
 		return
 	}
 	// Add the new album to the slice.
-	players = append(players, komardjia)
+	srv.sqliteconn.AddPlayer(&komardjia)
+	//	players = append(players, komardjia)
 	ctx.IndentedJSON(http.StatusCreated, komardjia)
 }
 
