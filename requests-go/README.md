@@ -31,3 +31,7 @@ to add new player
         "name": "Lubaka F"
     }
 ```
+
+### Howto SQL
+1. Install `sqlite3`
+2. No setup needed 
