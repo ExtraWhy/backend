@@ -14,9 +14,13 @@ import (
 
 // todo: temp for testing - remove later
 var players = []player.Player{
-	{Id: 1, Name: "Lubaka F"},
-	{Id: 2, Name: "Lubaka K"},
-	{Id: 3, Name: "Kucheto"},
+	{Id: 1, Name: "Lubaka F", Money: 123456},
+	{Id: 2, Name: "Lubaka K", Money: 1},
+	{Id: 3, Name: "Kucheto", Money: 5},
+	{Id: 4, Name: "Kalniq", Money: 5},
+	{Id: 5, Name: "Potniq", Money: 5},
+	{Id: 6, Name: "Bavniq", Money: 5},
+	{Id: 7, Name: "Burziq", Money: 5},
 }
 
 // end todo
@@ -63,11 +67,26 @@ func getPlayerById(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusNotFound, gin.H{"message": errmsg})
 }
 
+func findById(p *player.Player) bool {
+	for _, id := range players {
+		if id.Id == p.Id {
+			return true
+		}
+	}
+	return false
+}
+
 func postPlayers(ctx *gin.Context) {
 	var komardjia player.Player
 
 	// Call BindJSON to bind the received JSON to
 	if err := ctx.BindJSON(&komardjia); err != nil {
+		return
+	}
+
+	if findById(&komardjia) {
+		errmsg := fmt.Sprintf("Player with id %d does  exists", komardjia.Id)
+		ctx.IndentedJSON(http.StatusNotFound, gin.H{"message": errmsg})
 		return
 	}
 	// Add the new album to the slice.

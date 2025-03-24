@@ -14,7 +14,7 @@
 ### Run:
 1. When it runs you may open browser to `localhost:8080/players` to see all
 2. run in terminal 
-`curl http://localhost:8080/players  --include  --header "Content-Type: application/json" --request "POST" --data '{"id" : 6, "name" : "Lubakamadafaka"}'` 
+`curl http://localhost:8080/players  --include  --header "Content-Type: application/json" --request "POST" --data '{"id" : 6, "money" : 10000, "name" : "Lubakamadafaka"}'` 
 to add new player
 
 ### Current api
@@ -22,3 +22,12 @@ to add new player
 1. GET 	`localhost:8080/players` - get all players 
 2. GET 	`localhost:8080/players/<id>` get player by id 
 3. POST	`localhost:8080/players` - post a new player (see Run)
+
+### Current player json format 
+```
+   {
+        "id": 1,
+        "money": 123456,
+        "name": "Lubaka F"
+    }
+```
