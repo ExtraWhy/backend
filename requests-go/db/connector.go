@@ -46,7 +46,6 @@ func (db *DBconnection) DisplayPlayers() []player.Player {
 		var p player.Player
 		row.Scan(&p.Id, &p.Money, &p.Name)
 		list = append(list, p)
-		log.Println("Player: ", p.Id, " ", p.Money, " ", p.Name)
 	}
 	return list
 }
@@ -81,5 +80,4 @@ func createTable(db *sql.DB) {
 		log.Fatal(err.Error())
 	}
 	statement.Exec() // Execute SQL Statements
-	log.Println("student table created")
 }
