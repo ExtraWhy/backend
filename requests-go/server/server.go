@@ -1,15 +1,16 @@
 package server
 
 import (
+	"casino/rest-backend/db"
 	"casino/rest-backend/player"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
-	"github.com/gin-contrib/cors"
 	"golang.org/x/crypto/acme/autocert"
 )
 
@@ -26,10 +27,11 @@ var players = []player.Player{
 
 // end todo
 type Server struct {
-	Host    string
-	Port    uint16
-	router  *gin.Engine
-	autocrt autocert.Manager //member for certificates with Let's encrypt
+	Host       string
+	Port       uint16
+	router     *gin.Engine
+	autocrt    autocert.Manager //member for certificates with Let's encrypt
+	sqliteconn db.DBconnection
 }
 
 func (srv *Server) SetHostPort(s string, p uint16) {
@@ -42,7 +44,10 @@ func (srv *Server) GetHostPortStr() string {
 }
 
 func (srv *Server) DoRun() error {
+	srv.sqliteconn.Init()
 	srv.router = gin.Default()
+
+	defer srv.sqliteconn.Deinit()
 
 	srv.router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend
@@ -50,15 +55,16 @@ func (srv *Server) DoRun() error {
 		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
 	}))
 
-	srv.router.GET("/players", getPlayers)
-	srv.router.GET("/players/:id", getPlayerById)
-	srv.router.POST("/players", postPlayers)
+	srv.router.GET("/players", srv.getPlayers)
+	srv.router.GET("/players/:id", getPlayerById) //todo
+	srv.router.POST("/players", srv.postPlayers)
 	return srv.router.Run("localhost:8080")
 }
 
 // priv
-func getPlayers(ctx *gin.Context) {
-	ctx.IndentedJSON(http.StatusOK, players)
+func (srv *Server) getPlayers(ctx *gin.Context) {
+	p := srv.sqliteconn.DisplayPlayers()
+	ctx.IndentedJSON(http.StatusOK, p)
 }
 
 func getPlayerById(ctx *gin.Context) {
@@ -84,7 +90,7 @@ func findById(p *player.Player) bool {
 	return false
 }
 
-func postPlayers(ctx *gin.Context) {
+func (srv *Server) postPlayers(ctx *gin.Context) {
 	var komardjia player.Player
 
 	// Call BindJSON to bind the received JSON to
@@ -98,7 +104,8 @@ func postPlayers(ctx *gin.Context) {
 		return
 	}
 	// Add the new album to the slice.
-	players = append(players, komardjia)
+	srv.sqliteconn.AddPlayer(&komardjia)
+	//	players = append(players, komardjia)
 	ctx.IndentedJSON(http.StatusCreated, komardjia)
 }
 
