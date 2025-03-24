@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 	"golang.org/x/crypto/acme/autocert"
 )
 
@@ -42,6 +43,13 @@ func (srv *Server) GetHostPortStr() string {
 
 func (srv *Server) DoRun() error {
 	srv.router = gin.Default()
+
+	srv.router.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend
+		AllowMethods: []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
+	}))
+
 	srv.router.GET("/players", getPlayers)
 	srv.router.GET("/players/:id", getPlayerById)
 	srv.router.POST("/players", postPlayers)
