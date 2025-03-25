@@ -1,6 +1,7 @@
 package server
 
 import (
+	"casino/rest-backend/config"
 	"casino/rest-backend/db"
 	"casino/rest-backend/player"
 	"fmt"
@@ -17,18 +18,10 @@ import (
 type Server struct {
 	Host       string
 	Port       uint16
+	Config     *config.AppConfig
 	router     *gin.Engine
 	autocrt    autocert.Manager //member for certificates with Let's encrypt
 	sqliteconn db.DBconnection
-}
-
-func (srv *Server) SetHostPort(s string, p uint16) {
-	srv.Host = s
-	srv.Port = p
-}
-
-func (srv *Server) GetHostPortStr() string {
-	return fmt.Sprintf("%s:%d", srv.Host, srv.Port)
 }
 
 func (srv *Server) DoRun() error {
@@ -46,7 +39,8 @@ func (srv *Server) DoRun() error {
 	srv.router.GET("/players", srv.getPlayers)
 	srv.router.GET("/players/:id", srv.getPlayerById)
 	srv.router.POST("/players", srv.postPlayers)
-	return srv.router.Run("localhost:8080")
+	hp := fmt.Sprintf("%s:%s", srv.Config.RestServiceHost, srv.Config.RestServicePort)
+	return srv.router.Run(hp)
 }
 
 // priv
