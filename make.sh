@@ -15,6 +15,7 @@ cd ..
 cd requests-go
 go get github.com/ExtraWhy/internal-libs
 go build  -o request-service main.go
+cp gen-players.sh ../bin
 mv request-service ../bin
 cp config.yaml ../bin
 
