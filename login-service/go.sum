@@ -1,5 +1,7 @@
 cloud.google.com/go/compute/metadata v0.3.0 h1:Tz+eQXMEqDIKRsmY3cHTL6FVaynIjX2QxYC4trgAKZc=
 cloud.google.com/go/compute/metadata v0.3.0/go.mod h1:zFmK7XCadkQkj6TtorcaGlCW1hT1fIilQDwofLpJ20k=
+github.com/ExtraWhy/internal-libs v0.0.0-20250326171602-b0c0ddf3ce78 h1:3qsvmuBGvmC9cjwaSrakr2rQf/JVMPLmllqFy30Ypm4=
+github.com/ExtraWhy/internal-libs v0.0.0-20250326171602-b0c0ddf3ce78/go.mod h1:R85Q4sBEpunnCENetiWv3e/+e/IWQcph1pywQPb/VtI=
 github.com/bytedance/sonic v1.11.6 h1:oUp34TzMlL+OY1OUWxHqsdkgC/Zfc85zGqw9siXjrc0=
 github.com/bytedance/sonic v1.11.6/go.mod h1:LysEHSvpvDySVdC2f87zGWf6CIKJcAvqab1ZaiQtds4=
 github.com/bytedance/sonic/loader v0.1.1 h1:c+e5Pt1k/cy5wMveRDyk2X4B9hF4g7an8N3zCYjJFNM=
