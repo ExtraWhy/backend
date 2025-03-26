@@ -7,6 +7,7 @@ mkdir bin
 cd login-service
 go build -o login-service main.go
 mv login-service ../bin
+cp .env ../bin
 
 cd ..
 
