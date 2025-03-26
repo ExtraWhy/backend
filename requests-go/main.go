@@ -4,6 +4,8 @@ import (
 	"casino/rest-backend/server"
 	"fmt"
 	"os"
+
+	"github.com/ExtraWhy/internal-libs/config"
 )
 
 func main() {
@@ -11,7 +13,7 @@ func main() {
 		fmt.Println("Error useage : provide yaml config file")
 		os.Exit(-1)
 	}
-	var conf = config.Application{}
+	var conf = config.RequestService{}
 	if err := conf.LoadConfig(os.Args[1]); err != nil {
 		fmt.Println("Failed to load cofig file")
 		os.Exit(-2)
@@ -19,5 +21,4 @@ func main() {
 	fmt.Println("--- server up ---")
 	s := server.Server{Config: &conf}
 	s.DoRun()
-
 }

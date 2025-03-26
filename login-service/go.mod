@@ -1,8 +1,6 @@
 module login-service
 
-go 1.23.0
-
-toolchain go1.24.1
+go 1.24.1
 
 require (
 	github.com/gin-gonic/gin v1.10.0
@@ -12,6 +10,7 @@ require (
 
 require (
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
+	github.com/ExtraWhy/internal-libs v0.0.0-20250326171602-b0c0ddf3ce78 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect

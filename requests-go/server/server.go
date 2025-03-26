@@ -1,14 +1,14 @@
 package server
 
 import (
-	"casino/rest-backend/config"
-	"casino/rest-backend/db"
-	"casino/rest-backend/player"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 
+	"github.com/ExtraWhy/internal-libs/config"
+	"github.com/ExtraWhy/internal-libs/db"
+	"github.com/ExtraWhy/internal-libs/player"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
@@ -18,14 +18,14 @@ import (
 type Server struct {
 	Host       string
 	Port       uint16
-	Config     *config.AppConfig
+	Config     *config.RequestService
 	router     *gin.Engine
 	autocrt    autocert.Manager //member for certificates with Let's encrypt
 	sqliteconn db.DBconnection
 }
 
 func (srv *Server) DoRun() error {
-	srv.sqliteconn.Init()
+	srv.sqliteconn.Init("players.db")
 	srv.router = gin.Default()
 
 	defer srv.sqliteconn.Deinit()
