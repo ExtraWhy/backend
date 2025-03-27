@@ -3,7 +3,7 @@ module casino/rest-backend
 go 1.24.1
 
 require (
-	github.com/ExtraWhy/internal-libs v0.0.0-20250326171602-b0c0ddf3ce78
+	github.com/ExtraWhy/internal-libs v0.0.0-20250327154416-698b098516e0
 	github.com/gin-contrib/cors v1.7.4
 	github.com/gin-gonic/autotls v1.1.1
 	github.com/gin-gonic/gin v1.10.0
@@ -31,6 +31,8 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
+	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/arch v0.15.0 // indirect
 	golang.org/x/net v0.37.0 // indirect
 	golang.org/x/sync v0.12.0 // indirect
