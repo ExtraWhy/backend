@@ -107,13 +107,13 @@ cd ..
 
 
 
-echo "Prepare login service"
-cd login-service
+echo "Prepare user service"
+cd user-service
 update_go
 
 go build -o $login_service_name main.go
 mv $login_service_name "../"$output
-cp .env "../"$output
+cp *.yaml "../"$output
 echo "finished"
 cd ..
 
@@ -123,7 +123,7 @@ cd requests-go
 go build  -o $request_service_name main.go
 cp gen-players.sh "../"$output
 mv $request_service_name "../"$output
-cp config.yaml "../"$output
+cp *.yaml "../"$output
 echo "finished"
 
 echo "end make casino all :-)"
