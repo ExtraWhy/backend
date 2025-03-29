@@ -1,0 +1,24 @@
+allowed_hosts:
+  - "http://localhost:3000"
+  - "https://cryptowin-ten.vercel.app"
+
+
+# CLIENT_IDS AND CLIENT SECRETS MUST NOT BE KEPT IN THE YAML FILE, NEED TO IMPLEMENT SECURITY VAULT AT LATER STAGE
+google_provider:
+  client_id: "173962797108-p2fkcc16vpereds09mcflf79k7j1qtef.apps.googleusercontent.com"
+  client_secret: "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"
+  user_info_url: "https://www.googleapis.com/oauth2/v2/userinfo" 
+  redirect_url: "http://localhost:8080/auth/google/callback"
+  scopes:
+    - "profile"
+    - "email"
+
+facebook_provider:
+  client_id: "2060808277727299"
+  client_secret: "a8cccbec45f3e6214c02b9199023324b"
+  user_info_url: "https://graph.facebook.com/me?fields=first_name,last_name,picture"
+  redirect_url: "http://localhost:8080/auth/facebook/callback"
+
+  scopes:
+    - "public_profile"
+    - "email"
