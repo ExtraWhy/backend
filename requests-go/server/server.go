@@ -15,6 +15,10 @@ import (
 	"golang.org/x/crypto/acme/autocert"
 )
 
+const (
+	LAST_PLAYERS = 5
+)
+
 type Server struct {
 	Host       string
 	Port       uint16
@@ -39,6 +43,8 @@ func (srv *Server) DoRun() error {
 	srv.router.GET("/players", srv.getPlayers)
 	srv.router.GET("/players/:id", srv.getPlayerById)
 	srv.router.POST("/players", srv.postPlayers)
+	srv.router.GET("/players/winners", srv.getWinners)
+
 	hp := fmt.Sprintf("%s:%s", srv.Config.RestServiceHost, srv.Config.RestServicePort)
 	return srv.router.Run(hp)
 }
@@ -47,6 +53,17 @@ func (srv *Server) DoRun() error {
 func (srv *Server) getPlayers(ctx *gin.Context) {
 	p := srv.sqliteconn.DisplayPlayers()
 	ctx.IndentedJSON(http.StatusOK, p)
+
+}
+
+func (srv *Server) getWinners(ctx *gin.Context) {
+	p := srv.sqliteconn.DisplayPlayers()
+	if len(p) >= LAST_PLAYERS {
+		ctx.IndentedJSON(http.StatusOK, p[len(p)-LAST_PLAYERS:])
+	} else {
+		ctx.IndentedJSON(http.StatusNoContent, gin.H{"message": "No content for winners"})
+	}
+
 }
 
 func (srv *Server) getPlayerById(ctx *gin.Context) {
