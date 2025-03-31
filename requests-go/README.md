@@ -21,7 +21,9 @@ to add new player
 
 1. GET 	`localhost:8081/players` - get all players 
 2. GET 	`localhost:8081/players/<id>` get player by id 
-3. POST	`localhost:8081/players` - post a new player (see Run)
+3. GET  `localhost:8081/players/winners` get last winners (todo criteria)
+4. POST	`localhost:8081/players` - post a new player (see Run)
+
 
 ### Current player json format 
 ```
