@@ -9,6 +9,8 @@ import (
 	"slices"
 
 	"github.com/ExtraWhy/internal-libs/config"
+	"github.com/ExtraWhy/internal-libs/db"
+	"github.com/ExtraWhy/internal-libs/models/user"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
@@ -19,14 +21,17 @@ type OAuthHandler struct {
 	Config              *config.UserService
 	GoogleOAuthConfig   *oauth2.Config
 	FacebookOAuthConfig *oauth2.Config
+	dbc                 db.DBConnection
 	cookieExpiry        int
 }
 
-func (handler *OAuthHandler) Init() error {
+func (handler *OAuthHandler) Init(dbc *db.DBConnection) error {
+  handler.dbc = dbc
 	handler.GoogleOAuthConfig = buildOAuthConfig(handler.Config.GoogleProvider, google.Endpoint)
 	handler.FacebookOAuthConfig = buildOAuthConfig(handler.Config.FacebookProvider, facebook.Endpoint)
 
 	handler.cookieExpiry = 3600
+
 
 	gin_engine := gin.Default()
 	gin_engine.SetTrustedProxies(nil)
@@ -37,9 +42,16 @@ func (handler *OAuthHandler) Init() error {
 	gin_engine.GET("/auth/facebook/login", handler.FacebookLogin)
 	gin_engine.GET("/auth/facebook/callback", handler.FacebookCallback)
 
+	gin_engine.GET("/users", handler.getUsers)
+
 	gin_engine.Run(":8080")
 
 	return nil
+}
+
+func (handler *OAuthHandler) getUsers (ctx *gin.Context) () {
+	p := handler.dbc.GetUsers()
+	ctx.IndentedJSON(http.StatusOK, p)
 }
 
 func buildOAuthConfig(provider config.OAuthProviderConfig, endpoint oauth2.Endpoint) *oauth2.Config {
@@ -58,7 +70,7 @@ func (handler *OAuthHandler) GoogleLogin(c *gin.Context) {
 
 func (handler *OAuthHandler) GoogleCallback(c *gin.Context) {
 	handler.handleOAuthCallback(c, handler.GoogleOAuthConfig, handler.Config.GoogleProvider.UserInfoUrl, func(userInfo map[string]any) (string, string) {
-		familyName, _ := userInfo["family_name"].(string)
+		Picture, _ := userInfo["family_name"].(string)
 		givenName, _ := userInfo["given_name"].(string)
 		picture, _ := userInfo["picture"].(string)
 		return fmt.Sprintf("%s %s", familyName, givenName), picture
@@ -75,8 +87,8 @@ func (handler *OAuthHandler) FacebookCallback(c *gin.Context) {
 		lastName, _ := userInfo["last_name"].(string)
 		picture := ""
 		// Facebook returns the picture as a nested object.
-		if picObj, ok := userInfo["picture"].(map[string]any); ok {
-			if data, ok := picObj["data"].(map[string]any); ok {
+    if picObj, ok := userInfo["picture"].(map[string]any) ok {
+      if data, ok := picObj["data"].(map[string]any) ok {
 				picture, _ = data["url"].(string)
 			}
 		}
@@ -138,6 +150,9 @@ func (handler *OAuthHandler) handleOAuthCallback(c *gin.Context, oauthConfig *oa
 
 	username, photo := extractUserData(userInfo)
 
+  user := user.User{Id: 1, Username: username, Email: token, Picture: photo}
+  handler.dbc.InsertUser(user)
+  
 	c.SetCookie("token", token.AccessToken, handler.cookieExpiry, "/", callbackURL, true, true)
 	c.SetCookie("photo", photo, handler.cookieExpiry, "/", callbackURL, true, false)
 	c.SetCookie("username", username, handler.cookieExpiry, "/", callbackURL, true, false)

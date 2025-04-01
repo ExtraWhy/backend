@@ -3,7 +3,7 @@ module user-service
 go 1.24.1
 
 require (
-	github.com/ExtraWhy/internal-libs v0.0.0-20250329181737-37c8b9445f35
+	github.com/ExtraWhy/internal-libs v0.0.0-20250401084949-ea2e52bf477d
 	github.com/gin-gonic/gin v1.10.0
 	golang.org/x/oauth2 v0.28.0
 )
@@ -25,6 +25,7 @@ require (
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mattn/go-sqlite3 v1.14.24 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect

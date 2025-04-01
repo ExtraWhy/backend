@@ -1,7 +1,8 @@
+db_name: "users.db"
+
 allowed_hosts:
   - "http://localhost:3000"
   - "https://cryptowin-ten.vercel.app"
-
 
 # CLIENT_IDS AND CLIENT SECRETS MUST NOT BE KEPT IN THE YAML FILE, NEED TO IMPLEMENT SECURITY VAULT AT LATER STAGE
 google_provider:

@@ -6,6 +6,7 @@ import (
 	"user-service/handlers"
 
 	"github.com/ExtraWhy/internal-libs/config"
+	"github.com/ExtraWhy/internal-libs/db"
 )
 
 func main() {
@@ -24,8 +25,12 @@ func main() {
 		os.Exit(-2)
 	}
 
+	dbc := &db.DBConnection{}
+	dbc.Init(conf.DBName, db.CreateUsersTable)
+	dbc.Deinit()
+
 	oauth_handler := handlers.OAuthHandler{Config: &conf}
-	oauth_handler.Init()
+	oauth_handler.Init(dbc)
 
 	fmt.Println("--- user-service up ---")
 }
