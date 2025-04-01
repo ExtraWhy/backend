@@ -19,17 +19,19 @@ func main() {
 		fmt.Printf("No config file provided, using default: %s\n", yaml_config_path)
 	}
 
-	var conf = config.UserService{}
-	if err := conf.LoadConfig(yaml_config_path); err != nil {
+	var conf = config.MegaConfig{}
+	service_config := config.UserService{}
+
+	if err := conf.LoadConfig(yaml_config_path, &service_config); err != nil {
 		fmt.Println("Failed to load cofig file")
 		os.Exit(-2)
 	}
 
 	dbc := &db.DBConnection{}
-	dbc.Init(conf.DBName, db.CreateUsersTable)
+	dbc.Init(service_config.DBName, db.CreateUsersTable)
 	defer dbc.Deinit()
 
-	oauth_handler := handlers.OAuthHandler{Config: &conf}
+	oauth_handler := handlers.OAuthHandler{Config: &service_config}
 	oauth_handler.Init(dbc)
 
 	fmt.Println("--- user-service up ---")
