@@ -28,7 +28,11 @@ func main() {
 	}
 
 	dbc := &db.DBConnection{}
-	dbc.Init(service_config.DBName, db.CreateUsersTable)
+	dbc.Init(service_config.DBName, service_config.DBDriver)
+	if err := dbc.Init(service_config.DBDriver, service_config.DBName); err != nil {
+		fmt.Printf("Failed to initialize DB: %v", err)
+	}
+	dbc.SetupSchema(db.CreateUsersTable)
 	defer dbc.Deinit()
 
 	oauth_handler := handlers.OAuthHandler{Config: &service_config}

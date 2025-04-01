@@ -43,13 +43,20 @@ func (handler *OAuthHandler) Init(dbc *db.DBConnection) error {
 
 	gin_engine.GET("/users", handler.getUsers)
 
-	gin_engine.Run(":8080")
+	addr := fmt.Sprintf("%s:%s", handler.Config.UserServiceHost, handler.Config.UserServicePort)
+	gin_engine.Run(addr)
 
 	return nil
 }
 
 func (handler *OAuthHandler) getUsers(ctx *gin.Context) {
-	p, _ := handler.dbc.GetUsers()
+	p, err := handler.dbc.GetUsers()
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Users DB Error"})
+		return
+	}
+
 	ctx.IndentedJSON(http.StatusOK, p)
 }
 
@@ -142,7 +149,6 @@ func (handler *OAuthHandler) handleOAuthCallback(c *gin.Context, oauthConfig *oa
 	body, _ := io.ReadAll(resp.Body)
 	var userInfo map[string]any
 	json.Unmarshal(body, &userInfo)
-	fmt.Println("USERINFOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", userInfo)
 
 	callbackURL := c.Query("state")
 	if !handler.isSafeRedirect(callbackURL) {

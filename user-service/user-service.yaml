@@ -1,4 +1,7 @@
+user_service_host: localhost
+user_service_port: 8080
 db_name: "users.db"
+db_driver: "sqlite3"
 
 allowed_hosts:
   - "http://localhost:3000"
