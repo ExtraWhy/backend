@@ -19,12 +19,13 @@ func main() {
 	}
 
 	var conf = config.MegaConfig{}
-	if _, err := conf.LoadConfig(yaml_config_path); err != nil {
+	usr := config.UserService{}
+	if err := conf.LoadConfig(yaml_config_path, &usr); err != nil {
 		fmt.Println("Failed to load cofig file")
 		os.Exit(-2)
 	}
 
-	oauth_handler := handlers.OAuthHandler{Config: &conf.User}
+	oauth_handler := handlers.OAuthHandler{Config: &usr}
 	oauth_handler.Init()
 
 	fmt.Println("--- user-service up ---")

@@ -15,11 +15,13 @@ func main() {
 	}
 
 	var conf = config.MegaConfig{}
-	if _, err := conf.LoadConfig("requests-service.yaml"); err != nil {
+	req := config.RequestService{}
+	if err := conf.LoadConfig(os.Args[1], &req); err != nil {
 		fmt.Println("Failed to load cofig file")
 		os.Exit(-2)
 	}
+
 	fmt.Println("--- server up ---")
-	s := server.Server{Config: &conf.Requests}
+	s := server.Server{Config: &req}
 	s.DoRun()
 }
