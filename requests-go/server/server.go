@@ -8,7 +8,7 @@ import (
 
 	"github.com/ExtraWhy/internal-libs/config"
 	"github.com/ExtraWhy/internal-libs/db"
-	"github.com/ExtraWhy/internal-libs/player"
+	"github.com/ExtraWhy/internal-libs/models/player"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
@@ -25,15 +25,16 @@ type Server struct {
 	Config     *config.RequestService
 	router     *gin.Engine
 	autocrt    autocert.Manager //member for certificates with Let's encrypt
-	sqliteconn db.DBconnection
+	sqliteconn db.DBConnection
 }
 
 func (srv *Server) DoRun() error {
-	srv.sqliteconn.Init("players.db")
+	srv.sqliteconn.Init("sqlite3", "players.db")
 	srv.router = gin.Default()
 
 	defer srv.sqliteconn.Deinit()
 
+	srv.sqliteconn.CreatePlayersTable()
 	srv.router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend
 		AllowMethods: []string{"GET", "POST", "OPTIONS"},
@@ -139,3 +140,4 @@ func (srv *Server) autoCertManagement() {
   log.Fatal(autotls.RunWithContext(ctx, r, "example1.com", "example2.com"))
 }
 */
+
