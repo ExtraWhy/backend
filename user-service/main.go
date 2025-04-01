@@ -6,6 +6,7 @@ import (
 	"user-service/handlers"
 
 	"github.com/ExtraWhy/internal-libs/config"
+	"github.com/ExtraWhy/internal-libs/db"
 )
 
 func main() {
@@ -19,14 +20,23 @@ func main() {
 	}
 
 	var conf = config.MegaConfig{}
-	usr := config.UserService{}
-	if err := conf.LoadConfig(yaml_config_path, &usr); err != nil {
+	service_config := config.UserService{}
+
+	if err := conf.LoadConfig(yaml_config_path, &service_config); err != nil {
 		fmt.Println("Failed to load cofig file")
 		os.Exit(-2)
 	}
 
-	oauth_handler := handlers.OAuthHandler{Config: &usr}
-	oauth_handler.Init()
+	dbc := &db.DBConnection{}
+	dbc.Init(service_config.DBName, service_config.DBDriver)
+	if err := dbc.Init(service_config.DBDriver, service_config.DBName); err != nil {
+		fmt.Printf("Failed to initialize DB: %v", err)
+	}
+	dbc.SetupSchema(db.CreateUsersTable)
+	defer dbc.Deinit()
+
+	oauth_handler := handlers.OAuthHandler{Config: &service_config}
+	oauth_handler.Init(dbc)
 
 	fmt.Println("--- user-service up ---")
 }
