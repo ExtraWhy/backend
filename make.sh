@@ -22,6 +22,7 @@ internal_libs=""
 internal_libs_db=""
 internal_libs_logger=""
 internal_libs_player=""
+internal_libs_user=""
 internal_libs_config=""
 internal_libs_proto_models=""
 
@@ -32,7 +33,8 @@ function defaults() {
 	internal_libs="github.com/ExtraWhy/internal-libs"
 	internal_libs_db="github.com/ExtraWhy/internal-libs/db"
 	internal_libs_logger="github.com/ExtraWhy/internal-libs/logger"
-	internal_libs_player="github.com/ExtraWhy/internal-libs/player"
+	internal_libs_player="github.com/ExtraWhy/internal-libs/models/player"
+	internal_libs_user="github.com/ExtraWhy/internal-libs/models/user"
 	internal_libs_config="github.com/ExtraWhy/internal-libs/config"
 	internal_libs_proto_models="github.com/ExtraWhy/internal-libs/proto-models"
 }
@@ -46,10 +48,10 @@ else
 	go get $internal_libs_db
 	go get $internal_libs_logger
 	go get $internal_libs_player
+	go get $internal_libs_user
 	go get $internal_libs_config
 	go get $internal_libs_proto_models
 	go mod tidy	
-
 fi
 	
 }
@@ -68,7 +70,8 @@ else
 		internal_libs="github.com/ExtraWhy/internal-libs@"$1
 		internal_libs_db="github.com/ExtraWhy/internal-libs/db@"$1
 		internal_libs_logger="github.com/ExtraWhy/internal-libs/logger@"$1
-		internal_libs_player="github.com/ExtraWhy/internal-libs/player@"$1
+		internal_libs_player="github.com/ExtraWhy/internal-libs/models/player@"$1
+		internal_libs_user="github.com/ExtraWhy/internal-libs/models/user@"$1
 		internal_libs_config="github.com/ExtraWhy/internal-libs/config@"$1
 		internal_libs_proto_models="github.com/ExtraWhy/internal-libs/proto-models@"$1
 	fi
@@ -79,6 +82,7 @@ echo $internal_libs
 echo $internal_libs_db
 echo $internal_libs_logger
 echo $internal_libs_player
+echo $internal_libs_user
 echo $internal_libs_config
 echo $internal_libs_proto_models
 echo "--------------------------------------------------------------------------------"
