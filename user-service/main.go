@@ -27,7 +27,7 @@ func main() {
 
 	dbc := &db.DBConnection{}
 	dbc.Init(conf.DBName, db.CreateUsersTable)
-	dbc.Deinit()
+	defer dbc.Deinit()
 
 	oauth_handler := handlers.OAuthHandler{Config: &conf}
 	oauth_handler.Init(dbc)
