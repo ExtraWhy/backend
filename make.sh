@@ -119,7 +119,7 @@ cd ..
 
 echo "Preparing requests service"
 cd requests-go
-
+update_go
 go build  -o $request_service_name main.go
 cp gen-players.sh "../"$output
 mv $request_service_name "../"$output
