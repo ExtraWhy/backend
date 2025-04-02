@@ -3,7 +3,7 @@ module proto/player/client
 go 1.24.1
 
 require (
-	github.com/ExtraWhy/internal-libs v0.0.0-20250401213842-7b6897a0dd99
+	github.com/ExtraWhy/internal-libs v0.0.0-20250402154114-c03e749f2455
 	google.golang.org/grpc v1.71.1
 )
 

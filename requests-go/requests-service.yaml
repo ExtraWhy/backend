@@ -3,4 +3,4 @@ database_url: postgres://postgres:@localhost:5432/database_dev
 database_type: sqlite3
 rest_service_host: localhost
 rest_service_port: 8081
-
+game_serv_port: 50051
