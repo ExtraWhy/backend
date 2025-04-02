@@ -1,8 +1,10 @@
-package main
+package server
 
 import (
 	"context"
+	"errors"
 	"flag"
+	"fmt"
 	"log"
 	"time"
 
@@ -12,7 +14,7 @@ import (
 )
 
 const (
-	defaultName = "Pishki"
+	defaultName = "CryptoWin"
 )
 
 var (
@@ -20,12 +22,17 @@ var (
 	name = flag.String("Name", defaultName, "Name to greet")
 )
 
-func main() {
+type WinRequest struct {
+	PlayerRequest  *pb.PlayerRequest
+	PlayerResponse *pb.PlayerResponse
+}
+
+func (wr *WinRequest) SendWin(id uint64) error {
 	flag.Parse()
 	// Set up a connection to the server.
 	conn, err := grpc.NewClient(*addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+		return errors.New("No connection to game service ")
 	}
 	defer conn.Close()
 	c := pb.NewServiceGameWonClient(conn)
@@ -33,12 +40,11 @@ func main() {
 	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	var n string = "aaa"
-	var id uint64 = 1
-	pr := &pb.PlayerRequest{Name: &n, Id: &id, Gameid: &id}
-	r, err := c.GetWinForPlayer(ctx, pr)
+	pr := &pb.PlayerRequest{Id: &id}
+	wr.PlayerResponse, err = c.GetWinForPlayer(ctx, pr)
 	if err != nil {
-		log.Fatalf("could not greet: %v", err)
+		return errors.New(fmt.Sprint("could not greet: %v", err))
 	}
-	log.Printf("Pish mi yajkata : %s parichki %d", r.GetName(), r.GetMoneyWon())
+	log.Printf("CryptoWin Proto : %s %d", wr.PlayerResponse.GetName(), wr.PlayerResponse.GetMoneyWon())
+	return nil
 }

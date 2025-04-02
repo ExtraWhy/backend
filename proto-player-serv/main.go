@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand/v2"
 	"net"
 
 	pb "github.com/ExtraWhy/internal-libs/proto-models"
@@ -17,14 +18,17 @@ var (
 
 // server is used to implement helloworld.GreeterServer.
 type server struct {
-	pb.UnimplementedGreeterServer
+	pb.UnimplementedServiceGameWonServer
 }
 
-// SayHello implements helloworld.GreeterServer
-func (s *server) SayHello(_ context.Context, in *pb.PlayerRequest) (*pb.PlayerResponse, error) {
-	v := "helllllo"
+func (s *server) GetWinForPlayer(ctx context.Context, in *pb.PlayerRequest) (*pb.PlayerResponse, error) {
+	v := fmt.Sprintf("Hello %s ", in.GetName())
+	won := rand.Uint64N(2)
 	log.Printf("Received: %v", in.GetName())
-	return &pb.PlayerResponse{Name: &v}, nil
+	autor := &pb.PlayerResponse{}
+	autor.Name = &v
+	autor.MoneyWon = &won
+	return autor, nil
 }
 
 func main() {
@@ -36,7 +40,7 @@ func main() {
 	}
 	s := grpc.NewServer()
 	srv := &server{}
-	pb.RegisterGreeterServer(s, srv)
+	pb.RegisterServiceGameWonServer(s, srv)
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
