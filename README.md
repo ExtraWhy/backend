@@ -6,7 +6,7 @@
 3. Start login service : `./user-service user-service.yaml`
 4. Start request service: `./request-service request-service.yaml`
 5. [optional] run `./gen-players.sh` to insert 10 dummy players
-
+6. [optional] run `./proto-player-serv` to start protobuf gameplay mockup
 
 ### Todo:
 1. Learn uber's zap logger and use it accordingly in the project
