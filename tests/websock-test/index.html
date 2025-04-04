@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Jackpot Viewer</title>
+    <style>
+      body { font-family: sans-serif; font-size: 24px; text-align: center; margin-top: 50px; }
+      #jackpot { font-size: 48px; color: green; }
+    </style>
+  </head>
+  <body>
+    <div>Current Jackpot:</div>
+    <div id="jackpot">$0.00</div>
+
+    <script>
+      const jackpotEl = document.getElementById('jackpot');
+      const socket = new WebSocket('ws://localhost:8080/ws');
+
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.jackpot !== undefined) {
+          jackpotEl.textContent = `$${data.jackpot.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+        }
+      };
+    </script>
+  </body>
+</html>
+
