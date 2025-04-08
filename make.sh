@@ -98,6 +98,7 @@ update_go
 
 go build -o $proto_service main.go
 mv $proto_service "../"$output
+cp *.sh "../"$output
 echo "finished"
 cd ..
 

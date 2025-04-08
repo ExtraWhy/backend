@@ -68,7 +68,13 @@ func (srv *Server) getPlayerPlay(gct *gin.Context) {
 						break
 					} else {
 						winner.Money = srv.winReq.PlayerResponse.GetMoneyWon()
-						fmt.Printf("Player %s won %d \r\n", winner.Name, winner.Money)
+						if winner.Money > 0 {
+							i.Money += winner.Money
+							m, _ := s.sqliteconn.UpdatePlayerMoney(&i)
+							if m > 0 {
+								fmt.Printf("Player %s won %d \r\n", winner.Name, winner.Money)
+							}
+						}
 						ctx.IndentedJSON(http.StatusOK, winner)
 						break
 					}
