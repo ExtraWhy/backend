@@ -5,8 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"math/rand/v2"
 	"net"
+	gametest "proto/player/server/game-test"
 
 	pb "github.com/ExtraWhy/internal-libs/proto-models"
 	"google.golang.org/grpc"
@@ -22,12 +22,18 @@ type server struct {
 }
 
 func (s *server) GetWinForPlayer(ctx context.Context, in *pb.PlayerRequest) (*pb.PlayerResponse, error) {
+	var m0 uint64 = 0
 	v := fmt.Sprintf("Hello %s ", in.GetName())
-	won := rand.Uint64N(2)
-	log.Printf("Received: %v", in.GetName())
+	res := gametest.RollLines()
 	autor := &pb.PlayerResponse{}
 	autor.Name = &v
-	autor.MoneyWon = &won
+	autor.MoneyWon = &m0
+	if res != nil {
+		log.Printf("[%d][%d][%d][%d][%d]\r\n", res.Top, res.Mid, res.Bottom, res.DHigh, res.DLow)
+		won := uint64(res.Bottom*25 + res.DHigh*10 + res.DLow*10 + res.Mid*100 + res.Top*25)
+		autor.MoneyWon = &won
+		return autor, nil
+	}
 	return autor, nil
 }
 

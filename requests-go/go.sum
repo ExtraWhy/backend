@@ -1,5 +1,5 @@
-github.com/ExtraWhy/internal-libs v0.0.0-20250402154114-c03e749f2455 h1:K5OBNwjhE24MaZjwvottFQzQQRTF95CGHHLzXsVo2ms=
-github.com/ExtraWhy/internal-libs v0.0.0-20250402154114-c03e749f2455/go.mod h1:cyTfKXECXqwSnGDQdIiAZ2vRAFcJnA8p+rX096EW0/I=
+github.com/ExtraWhy/internal-libs v0.0.0-20250408171613-db9b92399a46 h1:P4RM0zclwIe+KfU0hL5ZngB2JeW2XsE/PvxhKOKCKYg=
+github.com/ExtraWhy/internal-libs v0.0.0-20250408171613-db9b92399a46/go.mod h1:cyTfKXECXqwSnGDQdIiAZ2vRAFcJnA8p+rX096EW0/I=
 github.com/bytedance/sonic v1.13.2 h1:8/H1FempDZqC4VqjptGo14QQlJx8VdZJegxs6wwfqpQ=
 github.com/bytedance/sonic v1.13.2/go.mod h1:o68xyaF9u2gvVBuGHPlUVCy+ZfmNNO5ETf1+KgkJhz4=
 github.com/bytedance/sonic/loader v0.1.1/go.mod h1:ncP89zfokxS5LZrJxl5z0UJcsk4M4yY2JpfqGeCtNLU=
