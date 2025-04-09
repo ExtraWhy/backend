@@ -2,12 +2,12 @@ package main
 
 import (
 	"errors"
-	"fmt"
-	"log"
 	"math/rand"
+	"sort"
 	"time"
 
 	"github.com/ExtraWhy/internal-libs/models/games"
+	"github.com/ExtraWhy/internal-libs/models/player"
 )
 
 // check win and position
@@ -77,6 +77,51 @@ func rand_eng(min, max int) int {
 func rand_eng_dummy(min, max int) int {
 	return min + max
 }
+
+type cachedPlayer struct {
+	Hits  uint64
+	Id    uint64
+	Money uint64
+	Name  string
+}
+type skv struct {
+	k uint64
+	v cachedPlayer
+}
+
+var players_cache = make(map[uint64]cachedPlayer)
+var check_del = 0
+
+func drop_them() {
+	tb := []skv{}
+	if len(players_cache) < 5 {
+		return
+	}
+	for k, v := range players_cache {
+		tb = append(tb, skv{k, v})
+	}
+	sort.Slice(tb, func(i, j int) bool {
+		return tb[i].v.Hits > tb[j].v.Hits
+	})
+	for i := 0; i < len(tb)-5; i++ {
+		delete(players_cache, tb[i].k)
+	}
+}
+
+func put_to_cache(pl *player.Player) {
+
+	if found, ok := players_cache[pl.Id]; ok {
+		if pl.Money != found.Money {
+			players_cache[pl.Id] = cachedPlayer{Hits: found.Hits + 1, Name: found.Name, Money: pl.Money + found.Money, Id: pl.Id}
+		} else {
+			players_cache[pl.Id] = cachedPlayer{Hits: found.Hits + 1, Id: pl.Id, Money: pl.Money, Name: pl.Name}
+		}
+	} else {
+		players_cache[pl.Id] = cachedPlayer{Hits: 1, Id: pl.Id, Money: pl.Money, Name: pl.Name}
+	}
+}
+
+/*
 func main() {
 
 	fmt.Println("test")
@@ -93,4 +138,25 @@ func main() {
 		}
 	}
 
+}
+*/
+
+func main() {
+
+	for i := 0; i < 10; i++ {
+		p := player.Player{Id: uint64(i), Name: "Fakar"}
+		put_to_cache(&p)
+	}
+
+	for i := 0; i < 7; i++ {
+		p := player.Player{Id: uint64(i), Name: "Fakar"}
+		put_to_cache(&p)
+	}
+
+	for i := 0; i < 5; i++ {
+		p := player.Player{Id: uint64(i), Name: "Fakar"}
+		put_to_cache(&p)
+	}
+
+	drop_them()
 }
