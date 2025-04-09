@@ -4,6 +4,7 @@ import (
 	server "casino/rest-backend/proto-client"
 	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
 	"sync"
 
@@ -19,6 +20,51 @@ const (
 )
 
 var allNodesWaitGroup sync.WaitGroup
+
+type cachedPlayer struct {
+	Hits uint64
+	Pl   player.Player
+}
+type skv struct {
+	k uint64
+	v cachedPlayer
+}
+
+// bumpy cache to display most recent players that won
+var players_cache = make(map[uint64]cachedPlayer)
+
+func drop_them() {
+	tb := []skv{}
+	if len(players_cache) < 5 {
+		return
+	}
+	for k, v := range players_cache {
+		tb = append(tb, skv{k, v})
+	}
+	sort.Slice(tb, func(i, j int) bool {
+		return tb[i].v.Hits > tb[j].v.Hits
+	})
+	for i := 0; i < len(tb)-5; i++ {
+		delete(players_cache, tb[i].k)
+	}
+}
+
+func get_them() []player.Player {
+	pl := []player.Player{}
+	for _, v := range players_cache {
+		pl = append(pl, v.Pl)
+	}
+	return pl
+}
+
+func put_to_cache(pl *player.Player) {
+
+	if found, ok := players_cache[pl.Id]; ok {
+		players_cache[pl.Id] = cachedPlayer{Hits: found.Hits + 1, Pl: *pl}
+	} else {
+		players_cache[pl.Id] = cachedPlayer{Hits: 1, Pl: *pl}
+	}
+}
 
 type Server struct {
 	Host       string
@@ -70,10 +116,8 @@ func (srv *Server) getPlayerPlay(gct *gin.Context) {
 						winner.Money = srv.winReq.PlayerResponse.GetMoneyWon()
 						if winner.Money > 0 {
 							i.Money += winner.Money
-							m, _ := s.sqliteconn.UpdatePlayerMoney(&i)
-							if m > 0 {
-								fmt.Printf("Player %s won %d \r\n", winner.Name, winner.Money)
-							}
+							s.sqliteconn.UpdatePlayerMoney(&i)
+							put_to_cache(&i)
 						}
 						ctx.IndentedJSON(http.StatusOK, winner)
 						break
@@ -98,12 +142,21 @@ func (srv *Server) getPlayers(ctx *gin.Context) {
 }
 
 func (srv *Server) getWinners(ctx *gin.Context) {
-	p := srv.sqliteconn.DisplayPlayers()
-	if len(p) >= LAST_PLAYERS {
-		ctx.IndentedJSON(http.StatusOK, p[len(p)-LAST_PLAYERS:])
-	} else {
-		ctx.IndentedJSON(http.StatusNoContent, gin.H{"message": "No content for winners"})
+
+	if len(players_cache) > 0 {
+		drop_them()
+		pl := get_them()
+		fmt.Println(pl)
+		ctx.IndentedJSON(http.StatusOK, pl)
+		return
 	}
+	ctx.IndentedJSON(http.StatusNoContent, gin.H{"message": "No 5 winners present"})
+	//p := srv.sqliteconn.DisplayPlayers()
+	//if len(p) >= LAST_PLAYERS {
+	//		ctx.IndentedJSON(http.StatusOK, p[len(p)-LAST_PLAYERS:])
+	//	} else {
+	//		ctx.IndentedJSON(http.StatusNoContent, gin.H{"message": "No content for winners"})
+	//	}
 
 }
 
