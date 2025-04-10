@@ -71,7 +71,7 @@ type Server struct {
 	Port       uint16
 	Config     *config.RequestService
 	router     *gin.Engine
-	sqliteconn db.DBConnection
+	sqliteconn db.DBSqlConnection
 	winReq     server.WinRequest
 }
 

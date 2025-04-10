@@ -101,7 +101,7 @@ func drop_them() {
 		tb = append(tb, skv{k, v})
 	}
 	sort.Slice(tb, func(i, j int) bool {
-		return tb[i].v.Hits > tb[j].v.Hits
+		return tb[i].v.Hits < tb[j].v.Hits
 	})
 	for i := 0; i < len(tb)-5; i++ {
 		delete(players_cache, tb[i].k)
@@ -143,12 +143,7 @@ func main() {
 
 func main() {
 
-	for i := 0; i < 10; i++ {
-		p := player.Player{Id: uint64(i), Name: "Fakar"}
-		put_to_cache(&p)
-	}
-
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 5; i++ {
 		p := player.Player{Id: uint64(i), Name: "Fakar"}
 		put_to_cache(&p)
 	}
@@ -157,6 +152,30 @@ func main() {
 		p := player.Player{Id: uint64(i), Name: "Fakar"}
 		put_to_cache(&p)
 	}
+
+	for i := 0; i < 5; i++ {
+		p := player.Player{Id: uint64(i), Name: "Fakar"}
+		put_to_cache(&p)
+	}
+
+	for i := 0; i < 5; i++ {
+		p := player.Player{Id: uint64(i), Name: "Fakar"}
+		put_to_cache(&p)
+	}
+
+	for i := 0; i < 6; i++ {
+		p := player.Player{Id: uint64(i), Name: "Fakar"}
+		put_to_cache(&p)
+	}
+
+	for i := 0; i < 6; i++ {
+		p := player.Player{Id: uint64(i), Name: "Fakar"}
+		put_to_cache(&p)
+	}
+
+	drop_them()
+
+	drop_them()
 
 	drop_them()
 }
