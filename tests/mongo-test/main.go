@@ -2,8 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"log"
 
+	"github.com/ExtraWhy/internal-libs/models/player"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
@@ -31,4 +35,59 @@ func main() {
 		panic(err)
 	}
 	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
+
+	coll := client.Database("cryptowin").Collection("players")
+
+	//CREATE
+	//	pl := player.Player{Name: "Lubaka", Id: 1, Money: 9999}
+
+	//	result, err := coll.InsertOne(context.TODO(), pl)
+	//	if err != nil {
+	//		panic(err)
+	//	}
+	//	fmt.Printf("Inserted document with ID: %v", result.InsertedID)
+
+	var result player.Player
+	err = coll.FindOne(context.TODO(), bson.M{"id": 1}).Decode(&result)
+	if err != nil {
+		fmt.Printf("FindOne failed: %v", err)
+		return
+	}
+	jsonData, err := json.MarshalIndent(result, "", "    ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Found document: %s", jsonData)
+
+	result.Money *= 2
+	updt := bson.M{"$set": bson.M{"money": result.Money}}
+	_, err = coll.UpdateOne(context.TODO(), bson.M{"id": result.Id}, updt)
+	if err != nil {
+		fmt.Printf("UpdateOne failed: %v", err)
+		return
+	}
+
+	err = coll.FindOne(context.TODO(), bson.M{"id": 1}).Decode(&result)
+	if err != nil {
+		fmt.Printf("FindOne failed: %v", err)
+		return
+	}
+	jsonData, err = json.MarshalIndent(result, "", "    ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Update document: %s", jsonData)
+	//find all
+
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	for cursor.Next(context.TODO()) {
+		var elem player.Player
+		err := cursor.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(elem)
+
+	}
+
 }
