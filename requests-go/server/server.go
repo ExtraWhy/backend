@@ -67,19 +67,28 @@ func put_to_cache(pl *player.Player) {
 }
 
 type Server struct {
-	Host       string
-	Port       uint16
-	Config     *config.RequestService
-	router     *gin.Engine
-	sqliteconn db.DBConnection
-	winReq     server.WinRequest
+	Host    string
+	Port    uint16
+	Config  *config.RequestService
+	router  *gin.Engine
+	dbiface db.DbIface
+	winReq  server.WinRequest
 }
 
 func (srv *Server) DoRun() error {
-	srv.sqliteconn.Init("sqlite3", "players.db")
-	srv.router = gin.Default()
-	defer srv.sqliteconn.Deinit()
-	srv.sqliteconn.CreatePlayersTable()
+
+	if srv.Config.DatabaseType == "mongo" {
+		srv.dbiface = &db.NoSqlConnection{}
+		srv.dbiface.Init("Cluster0", "cryptowincryptowin:EfK0weUUe7t99Djx")
+		srv.router = gin.Default()
+
+	} else {
+		srv.dbiface = &db.DBSqlConnection{}
+		srv.dbiface.Init("sqlite3", "players.db")
+		srv.router = gin.Default()
+		defer srv.dbiface.Deinit()
+		srv.dbiface.(*db.DBSqlConnection).CreatePlayersTable()
+	}
 	srv.router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend
 		AllowMethods: []string{"GET", "POST", "OPTIONS"},
@@ -103,7 +112,7 @@ func (srv *Server) getPlayerPlay(gct *gin.Context) {
 		defer allNodesWaitGroup.Done()
 		id := ctx.Param("id")
 		tmp, _ := strconv.ParseUint(id, 10, 64) //TODO handle error laster
-		players := s.sqliteconn.DisplayPlayers()
+		players := s.dbiface.DisplayPlayers()
 		if len(players) > 0 {
 			for _, i := range players {
 				if i.Id == tmp {
@@ -116,7 +125,7 @@ func (srv *Server) getPlayerPlay(gct *gin.Context) {
 						winner.Money = srv.winReq.PlayerResponse.GetMoneyWon()
 						if winner.Money > 0 {
 							i.Money += winner.Money
-							s.sqliteconn.UpdatePlayerMoney(&i)
+							s.dbiface.UpdatePlayerMoney(&i)
 							put_to_cache(&i)
 						}
 						ctx.IndentedJSON(http.StatusOK, winner)
@@ -132,7 +141,7 @@ func (srv *Server) getPlayerPlay(gct *gin.Context) {
 }
 
 func (srv *Server) getPlayers(ctx *gin.Context) {
-	p := srv.sqliteconn.DisplayPlayers()
+	p := srv.dbiface.DisplayPlayers()
 	if len(p) > 0 {
 		ctx.IndentedJSON(http.StatusOK, p)
 	} else {
@@ -163,7 +172,7 @@ func (srv *Server) getWinners(ctx *gin.Context) {
 func (srv *Server) getPlayerById(ctx *gin.Context) {
 	id := ctx.Param("id")
 	tmp, _ := strconv.ParseUint(id, 10, 64) //TODO handle error laster
-	players := srv.sqliteconn.DisplayPlayers()
+	players := srv.dbiface.DisplayPlayers()
 	for _, a := range players {
 		if a.Id == tmp {
 			ctx.IndentedJSON(http.StatusOK, a)
@@ -190,14 +199,14 @@ func (srv *Server) postPlayers(ctx *gin.Context) {
 	if err := ctx.BindJSON(&komardjia); err != nil {
 		return
 	}
-	p := srv.sqliteconn.DisplayPlayers()
+	p := srv.dbiface.DisplayPlayers()
 	if findById(&komardjia, p) {
 		errmsg := fmt.Sprintf("Player with id %d does  exists", komardjia.Id)
 		ctx.IndentedJSON(http.StatusNotFound, gin.H{"message": errmsg})
 		return
 	}
 	// Add the new album to the slice.
-	srv.sqliteconn.AddPlayer(&komardjia)
+	srv.dbiface.AddPlayer(&komardjia)
 	//	players = append(players, komardjia)
 	ctx.IndentedJSON(http.StatusCreated, komardjia)
 }

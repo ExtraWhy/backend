@@ -27,7 +27,7 @@ func main() {
 		os.Exit(-2)
 	}
 
-	dbc := &db.DBConnection{}
+	dbc := &db.DBSqlConnection{}
 	dbc.Init(service_config.DBName, service_config.DBDriver)
 	if err := dbc.Init(service_config.DBDriver, service_config.DBName); err != nil {
 		fmt.Printf("Failed to initialize DB: %v", err)

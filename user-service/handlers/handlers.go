@@ -21,11 +21,11 @@ type OAuthHandler struct {
 	Config              *config.UserService
 	GoogleOAuthConfig   *oauth2.Config
 	FacebookOAuthConfig *oauth2.Config
-	dbc                 *db.DBConnection
+	dbc                 *db.DBSqlConnection
 	cookieExpiry        int
 }
 
-func (handler *OAuthHandler) Init(dbc *db.DBConnection) error {
+func (handler *OAuthHandler) Init(dbc *db.DBSqlConnection) error {
 	handler.dbc = dbc
 	handler.GoogleOAuthConfig = buildOAuthConfig(handler.Config.GoogleProvider, google.Endpoint)
 	handler.FacebookOAuthConfig = buildOAuthConfig(handler.Config.FacebookProvider, facebook.Endpoint)

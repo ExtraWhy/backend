@@ -14,6 +14,7 @@ import (
 )
 
 func main() {
+
 	// Use the SetServerAPIOptions() method to set the version of the Stable API on the client
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI("mongodb+srv://cryptowincryptowin:EfK0weUUe7t99Djx@cluster0.w07rcmn.mongodb.net/?appName=Cluster0").SetServerAPIOptions(serverAPI)

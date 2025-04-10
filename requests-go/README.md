@@ -38,6 +38,14 @@ to add new player
 #### Howto SQL (optional)
 1. Install `sqlite3`
 2. No setup needed 
+3. Edit `requests-service.yaml` -> `database_type: sqlite3`
+
+#### Howto MONGODB
+1. Start [here](https://account.mongodb.com/account/login)
+2. Follow the guide
+3. [cheetsheet](https://www.mongodb.com/developer/products/mongodb/cheat-sheet/)
+4. Edit `requests-service.yaml` -> `database_type: mongo`
+
 
 #### Dummy data
 1. After `make.sh` go to `bin`
@@ -61,3 +69,4 @@ You should see the test data:
 6. Optional to test the random gameplay:
 - run `proto-player-serv` in `bin` folder copied with `make.sh`
 - use `GET players/id/play` to recieve a random win/lose between 0 and 1
+
