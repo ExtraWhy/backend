@@ -25,19 +25,13 @@ type server struct {
 func (s *server) GetWinForPlayer(ctx context.Context, in *pb.PlayerRequest) (*pb.PlayerResponse, error) {
 	var m0 uint64 = 0
 	v := fmt.Sprintf("Hello %s ", in.GetName())
-	res := gametest.RollLines()
+	mult, lines := gametest.RollLines()
 	autor := &pb.PlayerResponse{}
 	autor.Name = &v
 	autor.MoneyWon = &m0
-	if res != nil {
-		log.Printf("[%d][%d][%d][%d][%d][%d][%d][%d][%d][%d]\r\n",
-			res.Top, res.Mid,
-			res.Bottom, res.DHigh,
-			res.DLow, res.ZigRight,
-			res.ZizLeft, res.ZigDoubleLeft, res.ZigDoubleRight,
-			res.ZigLongLeft)
-		won := uint64(res.Bottom*25 + res.DHigh*10 + res.DLow*10 + res.Mid*100 + res.Top*25 + res.ZigRight*5 + res.ZizLeft*5 + res.ZigLongLeft*7)
-		autor.MoneyWon = &won
+	if lines != nil {
+		autor.MoneyWon = &mult
+		autor.Lines = lines
 		return autor, nil
 	}
 	return autor, nil
