@@ -99,7 +99,7 @@ func (srv *Server) DoRun() error {
 	srv.router.GET("/players/:id", srv.getPlayerById)
 	srv.router.POST("/players", srv.postPlayers)
 	srv.router.GET("/players/winners", srv.getWinners)
-	srv.router.GET("/players/:id/play", srv.getPlayerPlay)
+	srv.router.GET("/players/:id/bet/:m", srv.getPlayerPlay)
 	hp := fmt.Sprintf("%s:%s", srv.Config.RestServiceHost, srv.Config.RestServicePort)
 	return srv.router.Run(hp)
 }
@@ -111,12 +111,23 @@ func (srv *Server) getPlayerPlay(gct *gin.Context) {
 	go func(s *Server, ctx *gin.Context) {
 		defer allNodesWaitGroup.Done()
 		id := ctx.Param("id")
+		bet := ctx.Param("m")
 		tmp, _ := strconv.ParseUint(id, 10, 64) //TODO handle error laster
+		beti, err := strconv.ParseUint(bet, 10, 64)
+		if err != nil {
+			ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Error in bet request to bet", "err": err})
+			return
+		}
+
 		players := s.dbiface.DisplayPlayers()
 		if len(players) > 0 {
 			for _, i := range players {
 				if i.Id == tmp {
-					winner := player.Player{Id: i.Id, Name: i.Name}
+					if i.Money < beti {
+						ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Not enough cuurencty  to bet"})
+						break
+					}
+					winner := player.Player{Id: i.Id, Name: i.Name, Money: 0}
 					//do proto call
 					if err := srv.winReq.SendWin(tmp); err != nil {
 						ctx.IndentedJSON(http.StatusBadGateway, gin.H{"message": "Fail to talk to the game service"})
@@ -125,9 +136,11 @@ func (srv *Server) getPlayerPlay(gct *gin.Context) {
 						winner.Money = srv.winReq.PlayerResponse.GetMoneyWon()
 						if winner.Money > 0 {
 							i.Money += winner.Money
-							s.dbiface.UpdatePlayerMoney(&i)
 							put_to_cache(&i)
+						} else {
+							i.Money = i.Money - beti
 						}
+						s.dbiface.UpdatePlayerMoney(&i)
 						ctx.IndentedJSON(http.StatusOK, winner)
 						break
 					}
@@ -160,12 +173,6 @@ func (srv *Server) getWinners(ctx *gin.Context) {
 		return
 	}
 	ctx.IndentedJSON(http.StatusNoContent, gin.H{"message": "No 5 winners present"})
-	//p := srv.sqliteconn.DisplayPlayers()
-	//if len(p) >= LAST_PLAYERS {
-	//		ctx.IndentedJSON(http.StatusOK, p[len(p)-LAST_PLAYERS:])
-	//	} else {
-	//		ctx.IndentedJSON(http.StatusNoContent, gin.H{"message": "No content for winners"})
-	//	}
 
 }
 
