@@ -2,6 +2,8 @@ package main
 
 import (
 	"errors"
+	"fmt"
+	"log"
 	"math/rand"
 	"sort"
 	"time"
@@ -13,7 +15,7 @@ import (
 // check win and position
 func check_help2(a [5][3]uint16, g *games.Game, w *games.Win) *games.Win {
 	var i, l = 0, 0
-	for l = 0; l < 5; l++ {
+	for l = 0; l < 10; l++ {
 		for i = 0; i < 5 && a[i][g.Lines[l][i]] == a[0][g.Lines[l][0]]; i++ {
 		}
 
@@ -31,6 +33,15 @@ func check_help2(a [5][3]uint16, g *games.Game, w *games.Win) *games.Win {
 		}
 		if l == 4 && i == 5 {
 			w.DHigh = 1
+		}
+		if l == 5 && i == 5 {
+			w.ZigRight = 1
+		}
+		if l == 6 && i == 5 {
+			w.ZizLeft = 1
+		}
+		if l == 9 && i == 5 {
+			w.ZigLongLeft = 1
 		}
 	}
 	return w
@@ -121,7 +132,6 @@ func put_to_cache(pl *player.Player) {
 	}
 }
 
-/*
 func main() {
 
 	fmt.Println("test")
@@ -139,8 +149,8 @@ func main() {
 	}
 
 }
-*/
 
+/*
 func main() {
 
 	for i := 0; i < 5; i++ {
@@ -179,3 +189,4 @@ func main() {
 
 	drop_them()
 }
+*/

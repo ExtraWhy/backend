@@ -1,4 +1,6 @@
-github.com/ExtraWhy/internal-libs v0.0.0-20250407192835-f68f807ddb90 h1:MahabxxgQ+7NQUPH5szmWRHQlvrbxHYs98oMmgNKc20=
-github.com/ExtraWhy/internal-libs v0.0.0-20250407192835-f68f807ddb90/go.mod h1:cyTfKXECXqwSnGDQdIiAZ2vRAFcJnA8p+rX096EW0/I=
 github.com/ExtraWhy/internal-libs v0.0.0-20250408151131-c346099a5add h1:eKd7LPncF4yIGUtU+KQ+xEI9qxdtMFs9MKa9XzAvFXk=
 github.com/ExtraWhy/internal-libs v0.0.0-20250408151131-c346099a5add/go.mod h1:cyTfKXECXqwSnGDQdIiAZ2vRAFcJnA8p+rX096EW0/I=
+github.com/ExtraWhy/internal-libs v0.0.0-20250412123132-f4df8232710e h1:pWhG0Vcckk0f722LXgJarC5mqPBNQtPmEv5CoH/Zy4k=
+github.com/ExtraWhy/internal-libs v0.0.0-20250412123132-f4df8232710e/go.mod h1:R8XJ+ADi/ve96fzE4Pavo+V1xeNyE91IV4haV3hf43I=
+github.com/ExtraWhy/internal-libs v0.0.0-20250412124104-cee8e2311e00 h1:1dQDuQ51EKlyW77O4ctBf0lPdZb2eFUKP7uf8oM2eV0=
+github.com/ExtraWhy/internal-libs v0.0.0-20250412124104-cee8e2311e00/go.mod h1:R8XJ+ADi/ve96fzE4Pavo+V1xeNyE91IV4haV3hf43I=
