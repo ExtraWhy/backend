@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"proto/player/server/bitvector"
+	"sync"
 	"time"
 
 	"github.com/ExtraWhy/internal-libs/models/games"
@@ -12,20 +13,20 @@ import (
 
 var gameMode *games.Game
 var (
-	bvec     bitvector.Bitvector
-	inited   bool = false
-	paytable      = []uint64{50, 100, 50,
+	bvec     *bitvector.Bitvector
+	once     sync.Once
+	paytable = []uint64{50, 100, 50,
 		25, 25, 25,
 		20, 20, 20,
 		10, 10, 10, 5}
 )
 
 func bvecInst() *bitvector.Bitvector {
-	if !inited {
+	once.Do(func() {
+		bvec = &bitvector.Bitvector{}
 		bvec.NewBitvector(1)
-		inited = true
-	}
-	return &bvec
+	})
+	return bvec
 }
 
 // check win and position
