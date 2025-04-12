@@ -105,6 +105,17 @@ func (srv *Server) DoRun() error {
 }
 
 // priv
+//Id    uint64 `json:"id"`
+//Money uint64 `json:"money"`
+//Name  string `json:"name"`
+
+type Bdata uint16
+
+type Fe_resp struct {
+	Won   uint64  `json:"won"`
+	Name  string  `json:"name"`
+	Lines []Bdata `json:"lines"`
+}
 
 func (srv *Server) getPlayerPlay(gct *gin.Context) {
 	allNodesWaitGroup.Add(1)
@@ -127,21 +138,26 @@ func (srv *Server) getPlayerPlay(gct *gin.Context) {
 						ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Not enough cuurencty  to bet"})
 						break
 					}
-					winner := player.Player{Id: i.Id, Name: i.Name, Money: 0}
 					//do proto call
 					if err := srv.winReq.SendWin(tmp); err != nil {
 						ctx.IndentedJSON(http.StatusBadGateway, gin.H{"message": "Fail to talk to the game service"})
 						break
 					} else {
-						winner.Money = srv.winReq.PlayerResponse.GetMoneyWon()
-						if winner.Money > 0 {
-							i.Money += winner.Money
+						fe := Fe_resp{Name: i.Name,
+							Won: srv.winReq.PlayerResponse.GetMoneyWon(),
+						}
+						if fe.Won > 0 {
+							i.Money += (fe.Won * beti)
+							tmp2 := srv.winReq.PlayerResponse.GetLines()
+							for i := 0; i < len(tmp2); i++ {
+								fe.Lines = append(fe.Lines, Bdata(tmp2[i]))
+							}
 							put_to_cache(&i)
 						} else {
 							i.Money = i.Money - beti
 						}
 						s.dbiface.UpdatePlayerMoney(&i)
-						ctx.IndentedJSON(http.StatusOK, winner)
+						ctx.IndentedJSON(http.StatusOK, fe)
 						break
 					}
 				}

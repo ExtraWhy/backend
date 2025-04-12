@@ -4,56 +4,45 @@ import (
 	"errors"
 	"log"
 	"math/rand"
+	"proto/player/server/bitvector"
 	"time"
 
 	"github.com/ExtraWhy/internal-libs/models/games"
 )
 
 var gameMode *games.Game
+var (
+	bvec     bitvector.Bitvector
+	inited   bool = false
+	paytable      = []uint64{50, 100, 50,
+		25, 25, 25,
+		20, 20, 20,
+		10, 10, 10, 5}
+)
+
+func bvecInst() *bitvector.Bitvector {
+	if !inited {
+		bvec.NewBitvector(1)
+		inited = true
+	}
+	return &bvec
+}
 
 // check win and position
-func check_help2(a [5][3]uint16, g *games.Game, w *games.Win) *games.Win {
+func check_help2(a [5][3]uint16, g *games.Game) []uint8 {
 	var i, l = 0, 0
 	for l = 0; l < 10; l++ {
 		for i = 0; i < 5 && a[i][g.Lines[l][i]] == a[0][g.Lines[l][0]]; i++ {
 		}
-
-		if l == 0 && i == 5 {
-			w.Mid = 1
-		}
-		if l == 1 && i == 5 {
-			w.Top = 1
-		}
-		if l == 2 && i == 5 {
-			w.Bottom = 1
-		}
-		if l == 3 && i == 5 {
-			w.DLow = 1
-		}
-		if l == 4 && i == 5 {
-			w.DHigh = 1
-		}
-		if l == 5 && i == 5 {
-			w.ZigRight = 1
-		}
-		if l == 6 && i == 5 {
-			w.ZizLeft = 1
-		}
-		if l == 7 && i == 5 {
-			w.ZigDoubleLeft = 1
-		}
-		if l == 8 && i == 5 {
-			w.ZigDoubleRight = 1
-		}
-		if l == 9 && i == 5 {
-			w.ZigLongLeft = 1
+		if i == 5 {
+			bvecInst().Add(l)
 		}
 	}
-	return w
+	return bvecInst().Indices()
 }
 
 // slide window by 1 back 1 forth [-1 , rand element , +1]
-func check_help1(a []uint16, g *games.Game, w *games.Win) *games.Win {
+func check_help1(a []uint16, g *games.Game) []uint8 {
 
 	var m1 = [5][3]uint16{}
 	for i := 0; i < 5; i++ {
@@ -72,7 +61,7 @@ func check_help1(a []uint16, g *games.Game, w *games.Win) *games.Win {
 
 		}
 	}
-	return check_help2(m1, g, w)
+	return check_help2(m1, g)
 }
 
 func SetupGame(b bool) {
@@ -83,15 +72,12 @@ func SetupGame(b bool) {
 	}
 }
 
-func CheckWin(a []uint16, g *games.Game) (*games.Win, error) {
-	w := &games.Win{Top: 0, Bottom: 0, Mid: 0,
-		DLow: 0, DHigh: 0, ZigRight: 0, ZizLeft: 0,
-		ZigDoubleLeft: 0, ZigDoubleRight: 0, ZigLongLeft: 0}
+func CheckWin(a []uint16, g *games.Game) ([]uint8, error) {
 
 	if len(a) != 5 {
 		return nil, errors.New("logical error, array must be 5 elements")
 	}
-	return check_help1(a, g, w), nil
+	return check_help1(a, g), nil
 }
 
 func rand_eng(min, max int) int {
@@ -99,16 +85,23 @@ func rand_eng(min, max int) int {
 	return rand.Intn(max-min+1) + min
 }
 
-func RollLines() *games.Win {
+func RollLines() (uint64, []uint8) {
 	var data = make([]uint16, 5)
+	var multiplyer uint64
 	for j := 0; j < 5; j++ {
 		ridx := rand_eng(0, len(gameMode.Reels[j])-1)
 		data[j] = uint16(ridx)
 	}
 	if res, err := CheckWin(data, gameMode); err != nil {
+		bvecInst().Reset()
 		log.Fatal("Exception in logic", err)
 	} else {
-		return res
+		for i := 0; i < len(res); i++ {
+			multiplyer += paytable[res[i]]
+		}
+		bvecInst().Reset()
+		return multiplyer, res
 	}
-	return nil
+	bvecInst().Reset()
+	return 1, nil
 }

@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+
 	if len(os.Args) != 2 {
 		fmt.Println("Error useage : provide yaml config file")
 		os.Exit(-1)
@@ -16,6 +17,7 @@ func main() {
 
 	var conf = config.MegaConfig{}
 	req := config.RequestService{}
+	//conf.LoadConfig("requests-service.yaml", &req); err != nil {
 	if err := conf.LoadConfig(os.Args[1], &req); err != nil {
 		fmt.Println("Failed to load cofig file")
 		os.Exit(-2)
