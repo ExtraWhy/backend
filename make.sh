@@ -103,15 +103,15 @@ echo "finished"
 cd ..
 
 
-
-echo "Prepare proto client "
-cd proto-player-client
-update_go
-
-go build -o $proto_client main.go
-mv $proto_client "../"$output
-echo "finished"
-cd ..
+#removed for now
+#echo "Prepare proto client "
+#cd proto-player-client
+#update_go
+#
+#go build -o $proto_client main.go
+#mv $proto_client "../"$output
+#echo "finished"
+#cd ..
 
 
 

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	gametest "proto/player/server/game-test"
 
 	pb "github.com/ExtraWhy/internal-libs/proto-models"
@@ -29,8 +30,13 @@ func (s *server) GetWinForPlayer(ctx context.Context, in *pb.PlayerRequest) (*pb
 	autor.Name = &v
 	autor.MoneyWon = &m0
 	if res != nil {
-		log.Printf("[%d][%d][%d][%d][%d]\r\n", res.Top, res.Mid, res.Bottom, res.DHigh, res.DLow)
-		won := uint64(res.Bottom*25 + res.DHigh*10 + res.DLow*10 + res.Mid*100 + res.Top*25)
+		log.Printf("[%d][%d][%d][%d][%d][%d][%d][%d][%d][%d]\r\n",
+			res.Top, res.Mid,
+			res.Bottom, res.DHigh,
+			res.DLow, res.ZigRight,
+			res.ZizLeft, res.ZigDoubleLeft, res.ZigDoubleRight,
+			res.ZigLongLeft)
+		won := uint64(res.Bottom*25 + res.DHigh*10 + res.DLow*10 + res.Mid*100 + res.Top*25 + res.ZigRight*5 + res.ZizLeft*5 + res.ZigLongLeft*7)
 		autor.MoneyWon = &won
 		return autor, nil
 	}
@@ -38,6 +44,14 @@ func (s *server) GetWinForPlayer(ctx context.Context, in *pb.PlayerRequest) (*pb
 }
 
 func main() {
+
+	if len(os.Args) > 1 && os.Args[1] == "t" {
+		gametest.SetupGame(true)
+		fmt.Println("Setting up game in test mode (very high win ration)")
+	} else {
+		fmt.Println("Setting up game in normal game (win ratio as designed)")
+		gametest.SetupGame(false)
+	}
 
 	flag.Parse()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
