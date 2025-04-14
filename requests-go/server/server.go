@@ -109,12 +109,10 @@ func (srv *Server) DoRun() error {
 //Money uint64 `json:"money"`
 //Name  string `json:"name"`
 
-type Bdata uint16
-
 type Fe_resp struct {
 	Won   uint64  `json:"won"`
 	Name  string  `json:"name"`
-	Lines []Bdata `json:"lines"`
+	Lines []uint8 `json:"lines"`
 }
 
 func (srv *Server) getPlayerPlay(gct *gin.Context) {
@@ -150,14 +148,17 @@ func (srv *Server) getPlayerPlay(gct *gin.Context) {
 							i.Money += (fe.Won * beti)
 							tmp2 := srv.winReq.PlayerResponse.GetLines()
 							for i := 0; i < len(tmp2); i++ {
-								fe.Lines = append(fe.Lines, Bdata(tmp2[i]))
+								fe.Lines = append(fe.Lines, tmp2[i])
 							}
 							put_to_cache(&i)
 						} else {
 							i.Money = i.Money - beti
 						}
-						s.dbiface.UpdatePlayerMoney(&i)
-						ctx.IndentedJSON(http.StatusOK, fe)
+						if _, err := s.dbiface.UpdatePlayerMoney(&i); err != nil {
+							ctx.IndentedJSON(http.StatusNotAcceptable, gin.H{"message": "Fails to update player"})
+						} else {
+							ctx.IndentedJSON(http.StatusOK, fe)
+						}
 						break
 					}
 				}
