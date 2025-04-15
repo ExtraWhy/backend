@@ -13,11 +13,11 @@ func (bv *Bitvector) NewBitvector(sz int) {
 }
 
 func (bv *Bitvector) Add(item int) {
-	bv.bset[item/64] |= (1 << (item % 64))
+	bv.bset[item>>6] |= (1 << (item % 64))
 }
 
 func (bv *Bitvector) Contains(item int) bool {
-	return (bv.bset[(item/64)] & (1 << (item % 64))) != 0
+	return (bv.bset[(item>>6)] & (1 << (item % 64))) != 0
 }
 
 func (bv *Bitvector) Indices() []uint8 {

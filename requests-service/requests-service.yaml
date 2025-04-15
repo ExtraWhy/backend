@@ -1,5 +1,6 @@
 
 database_url: postgres://postgres:@localhost:5432/database_dev
+api_type: rest 
 database_type: mongo
 rest_service_host: localhost
 rest_service_port: 8081

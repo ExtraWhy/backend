@@ -32,7 +32,6 @@ func (s *server) GetWinForPlayer(ctx context.Context, in *pb.PlayerRequest) (*pb
 	if lines != nil {
 		autor.MoneyWon = &mult
 		autor.Lines = lines
-		return autor, nil
 	}
 	return autor, nil
 }

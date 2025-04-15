@@ -70,3 +70,13 @@ You should see the test data:
 - run `proto-player-serv` in `bin` folder copied with `make.sh`
 - use `GET players/id/play` to recieve a random win/lose between 0 and 1
 
+#### Config (fill details later)
+The config has this layout
+```
+database_url: postgres://postgres:@localhost:5432/database_dev
+api_type: rest 
+database_type: mongo
+rest_service_host: localhost
+rest_service_port: 8081
+game_serv_port: 50051
+```

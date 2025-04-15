@@ -126,7 +126,7 @@ echo "finished"
 cd ..
 
 echo "Preparing requests service"
-cd requests-go
+cd requests-service
 update_go
 
 go build  -o $request_service_name main.go

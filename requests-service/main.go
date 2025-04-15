@@ -1,7 +1,8 @@
 package main
 
 import (
-	"casino/rest-backend/server"
+	server "casino/rest-backend/rest-server"
+
 	"fmt"
 	"os"
 
@@ -16,14 +17,14 @@ func main() {
 	}
 
 	var conf = config.MegaConfig{}
-	req := config.RequestService{}
+	srvconf := config.RequestService{}
 	//conf.LoadConfig("requests-service.yaml", &req); err != nil {
-	if err := conf.LoadConfig(os.Args[1], &req); err != nil {
+	if err := conf.LoadConfig(os.Args[1], &srvconf); err != nil {
 		fmt.Println("Failed to load cofig file")
 		os.Exit(-2)
 	}
 
 	fmt.Println("--- server up ---")
-	s := server.Server{Config: &req}
-	s.DoRun()
+	s := server.Server{}
+	s.DoRun(&srvconf)
 }
