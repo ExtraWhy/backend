@@ -1,10 +1,10 @@
 package server
 
 import (
+	playercache "casino/rest-backend/player-cache"
 	server "casino/rest-backend/proto-client"
 	"fmt"
 	"net/http"
-	"sort"
 	"strconv"
 	"sync"
 
@@ -15,69 +15,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const (
-	LAST_PLAYERS = 5
-)
-
 var allNodesWaitGroup sync.WaitGroup
-
-type cachedPlayer struct {
-	Hits uint64
-	Pl   player.Player
-}
-type skv struct {
-	k uint64
-	v cachedPlayer
-}
-
-// bumpy cache to display most recent players that won
-var players_cache = make(map[uint64]cachedPlayer)
-
-func drop_them() {
-	tb := []skv{}
-	if len(players_cache) < 5 {
-		return
-	}
-	for k, v := range players_cache {
-		tb = append(tb, skv{k, v})
-	}
-	sort.Slice(tb, func(i, j int) bool {
-		return tb[i].v.Hits > tb[j].v.Hits
-	})
-	for i := 0; i < len(tb)-5; i++ {
-		delete(players_cache, tb[i].k)
-	}
-}
-
-func get_them() []player.Player {
-	pl := []player.Player{}
-	for _, v := range players_cache {
-		pl = append(pl, v.Pl)
-	}
-	return pl
-}
-
-func put_to_cache(pl *player.Player) {
-
-	if found, ok := players_cache[pl.Id]; ok {
-		players_cache[pl.Id] = cachedPlayer{Hits: found.Hits + 1, Pl: *pl}
-	} else {
-		players_cache[pl.Id] = cachedPlayer{Hits: 1, Pl: *pl}
-	}
-}
 
 type Server struct {
 	Host    string
 	Port    uint16
-	Config  *config.RequestService
 	router  *gin.Engine
 	dbiface db.DbIface
 	winReq  server.WinRequest
 }
 
-func (srv *Server) DoRun() error {
+func (srv *Server) DoRun(conf *config.RequestService) error {
 
-	if srv.Config.DatabaseType == "mongo" {
+	if conf.DatabaseType == "mongo" {
 		srv.dbiface = &db.NoSqlConnection{}
 		srv.dbiface.Init("Cluster0", "cryptowincryptowin:EfK0weUUe7t99Djx")
 		srv.router = gin.Default()
@@ -100,14 +50,9 @@ func (srv *Server) DoRun() error {
 	srv.router.POST("/players", srv.postPlayers)
 	srv.router.GET("/players/winners", srv.getWinners)
 	srv.router.GET("/players/:id/bet/:m", srv.getPlayerPlay)
-	hp := fmt.Sprintf("%s:%s", srv.Config.RestServiceHost, srv.Config.RestServicePort)
+	hp := fmt.Sprintf("%s:%s", conf.RestServiceHost, conf.RestServicePort)
 	return srv.router.Run(hp)
 }
-
-// priv
-//Id    uint64 `json:"id"`
-//Money uint64 `json:"money"`
-//Name  string `json:"name"`
 
 type Fe_resp struct {
 	Won   uint64  `json:"won"`
@@ -150,7 +95,7 @@ func (srv *Server) getPlayerPlay(gct *gin.Context) {
 							for i := 0; i < len(tmp2); i++ {
 								fe.Lines = append(fe.Lines, tmp2[i])
 							}
-							put_to_cache(&i)
+							playercache.PutToCache(&i)
 						} else {
 							i.Money = i.Money - beti
 						}
@@ -182,9 +127,9 @@ func (srv *Server) getPlayers(ctx *gin.Context) {
 
 func (srv *Server) getWinners(ctx *gin.Context) {
 
-	if len(players_cache) > 0 {
-		drop_them()
-		pl := get_them()
+	if playercache.CacheSize() > 0 {
+		playercache.DropThem()
+		pl := playercache.GetThem()
 		fmt.Println(pl)
 		ctx.IndentedJSON(http.StatusOK, pl)
 		return

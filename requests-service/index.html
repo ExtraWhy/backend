@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket Client</title>
+</head>
+<body>
+  <h2>WebSocket Client</h2>
+
+  <label for="id">ID (integer):</label>
+  <input type="number" id="id">
+  <br><br>
+
+  <label for="bet">Bet (integer):</label>
+  <input type="number" id="bet">
+  <br><br>
+
+
+
+  <button onclick="connectWebSocket()">Connect</button>
+  <button onclick="sendData()">Send</button>
+  <button onclick="sendLogin()">Send Login</button>
+
+  <p id="status">Status: Not connected</p>
+
+  <script>
+    let socket;
+
+    function connectWebSocket() {
+      socket = new WebSocket("ws://localhost:8081/ws");
+    
+      socket.onopen = () => {
+        document.getElementById('status').textContent = 'Status: Connected';
+        console.log('WebSocket connected');
+      };
+
+      socket.onmessage = (event) => {
+        console.log('Received:', event.data);
+      };
+
+      socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+
+      socket.onclose = () => {
+        document.getElementById('status').textContent = 'Status: Disconnected';
+        console.log('WebSocket closed');
+      };
+    }
+
+
+    function sendData() {
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        alert('WebSocket is not connected!');
+        return;
+      }
+
+      const id = parseInt(document.getElementById('id').value, 10);
+      const message = parseInt(document.getElementById('bet').value, 10);
+
+      const payload = {
+        id: id,
+        money: message
+      };
+
+      socket.send(JSON.stringify(payload));
+      console.log('Sent:', payload);
+    }
+  </script>
+</body>
+</html>

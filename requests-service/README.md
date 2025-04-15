@@ -11,13 +11,13 @@
 2. Run the binary - defaults:
 `localhost:8081`
 
-#### Run:
-1. When it runs you may open browser to `localhost:8080/players` to see all
+#### Run (REST ONLY):
+1. When it runs you may open browser to `localhost:8081/players` to see all
 2. run in terminal 
 `curl http://localhost:8081/players  --include  --header "Content-Type: application/json" --request "POST" --data '{"id" : 6, "money" : 10000, "name" : "Lubakamadafaka"}'` 
 to add new player
 
-#### Current api
+#### API (REST)
 
 1. GET 	`localhost:8081/players` - get all players 
 2. GET 	`localhost:8081/players/<id>` get player by id 
@@ -25,6 +25,19 @@ to add new player
 4. POST	`localhost:8081/players` - post a new player (see Run)
 5. GET	`localhost:8081/players/<id>/bet/<money>` get a player and an amout won (MOCK)
 
+#### API (ws)
+1. Send json formatted string with 2 integers one to represent ID oher money bet
+ex.:
+```
+      const payload = {
+        id: id,
+        money: message
+      };
+
+      socket.send(JSON.stringify(payload));
+
+``` 
+2. Use the `index.html` page to test it locally
 
 #### Current player json format 
 ```
@@ -70,3 +83,21 @@ You should see the test data:
 - run `proto-player-serv` in `bin` folder copied with `make.sh`
 - use `GET players/id/play` to recieve a random win/lose between 0 and 1
 
+#### Config (fill details later)
+The config has this layout
+```
+database_url: postgres://postgres:@localhost:5432/database_dev
+api_type: rest 
+database_type: mongo
+rest_service_host: localhost
+rest_service_port: 8081
+game_serv_port: 50051
+```
+
+change `api_type` to `ws` to use websockets or `rest` to use rest api (old)
+
+
+#### TODO:
+1. get last winners is still rest call
+2. only bet is using websocket
+3. Implement all needed for Websocket

@@ -14,8 +14,7 @@ fi
 
 login_service_name="user-service"
 request_service_name="requests-service"
-proto_service="proto-player-service"
-proto_client="proto-player-client"
+proto_service="game-service"
 
 
 internal_libs=""
@@ -92,8 +91,8 @@ echo "--------------------------------------------------------------------------
 
 mkdir $output
 
-echo "Prepare proto service "
-cd proto-player-serv
+echo "Prepare game service "
+cd game-service
 update_go
 
 go build -o $proto_service main.go
@@ -101,18 +100,6 @@ mv $proto_service "../"$output
 cp *.sh "../"$output
 echo "finished"
 cd ..
-
-
-#removed for now
-#echo "Prepare proto client "
-#cd proto-player-client
-#update_go
-#
-#go build -o $proto_client main.go
-#mv $proto_client "../"$output
-#echo "finished"
-#cd ..
-
 
 
 echo "Prepare user service"
@@ -126,13 +113,14 @@ echo "finished"
 cd ..
 
 echo "Preparing requests service"
-cd requests-go
+cd requests-service
 update_go
 
 go build  -o $request_service_name main.go
 cp gen-players.sh "../"$output
 mv $request_service_name "../"$output
 cp *.yaml "../"$output
+cp *.html "../"$output
 echo "finished"
 
 echo "end make casino all :-)"
