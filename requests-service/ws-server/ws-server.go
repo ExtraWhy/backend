@@ -10,7 +10,6 @@ import (
 	"github.com/ExtraWhy/internal-libs/config"
 	"github.com/ExtraWhy/internal-libs/db"
 	"github.com/ExtraWhy/internal-libs/models/player"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -49,9 +48,8 @@ type skv struct {
 }
 
 type MessageBet struct {
-	Id     uint64 `json:"id"`
-	Action uint64 `json:"bet"`
-	Money  uint64 `json:"money"`
+	Id    uint64 `json:"id"`
+	Money uint64 `json:"money"`
 }
 
 type MessageLogin struct {
@@ -60,7 +58,6 @@ type MessageLogin struct {
 
 var clients = make(map[*websocket.Conn]*player.Player)
 var broadcast = make(chan MessageBet)
-var login = make(chan MessageLogin)
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -84,11 +81,11 @@ func (srv *WSServer) DoRun(conf *config.RequestService) error {
 		srv.dbiface.(*db.DBSqlConnection).CreatePlayersTable()
 	}
 
-	srv.router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend
-		AllowMethods: []string{"GET", "POST", "OPTIONS"},
-		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
-	}))
+	//	srv.router.Use(cors.New(cors.Config{
+	//		AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend
+	//		AllowMethods: []string{"GET", "POST", "OPTIONS"},
+	//		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
+	//	}))
 
 	srv.router.GET("/ws", func(c *gin.Context) {
 		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
@@ -103,61 +100,26 @@ func (srv *WSServer) DoRun(conf *config.RequestService) error {
 	})
 	go srv.handleBroadcast()
 	hp := fmt.Sprintf(":%s", conf.RestServicePort)
-
 	return srv.router.Run(hp)
 }
 
-func (ws *WSServer) handleWebSocketLogin(conn *websocket.Conn) {
-	for {
-		var message MessageLogin
-
-		err := conn.ReadJSON(&message)
-		if err != nil {
-			conn.Close()
-			delete(clients, conn)
-			break
-		}
-		pl := ws.dbiface.DisplayPlayers()
-		for i := 0; i < len(pl); i++ {
-			if pl[i].Id == message.Id {
-				clients[conn] = &pl[i]
-				break
-			}
-		}
-	}
-}
-
-func handleWebSocketConnection(conn *websocket.Conn) {
-	for {
-		var message MessageBet
-		err := conn.ReadJSON(&message)
-		if err != nil {
-			conn.Close()
-			delete(clients, conn)
-			break
-		}
-		broadcast <- message
-	}
-}
-
-func (srv *WSServer) getPlayerPlay(msg *MessageBet) (uint, *Fe_resp) {
+func (srv *WSServer) getPlayerPlay(msg *MessageBet, fe *Fe_resp) uint {
 
 	players := srv.dbiface.DisplayPlayers()
-	fe := Fe_resp{id: msg.Id}
-
+	fe.id = msg.Id
 	if len(players) > 0 {
 		for _, i := range players {
-			if i.Id == msg.Id {
+			if i.Id == fe.id {
 				if i.Money < msg.Money {
-					return no_money, nil
+					return no_money
 				}
 				//do proto call
 				if err := srv.winReq.SendWin(msg.Id); err != nil {
-					return unknownw, nil
+					return unknownw
 				} else {
+					fe.Won = srv.winReq.PlayerResponse.GetMoneyWon()
 					if fe.Won > 0 {
 						fe.Name = i.Name
-						fe.Won = srv.winReq.PlayerResponse.GetMoneyWon()
 						i.Money += (fe.Won * msg.Money)
 						tmp2 := srv.winReq.PlayerResponse.GetLines()
 						for i := 0; i < len(tmp2); i++ {
@@ -168,16 +130,17 @@ func (srv *WSServer) getPlayerPlay(msg *MessageBet) (uint, *Fe_resp) {
 						i.Money = i.Money - msg.Money
 					}
 					if _, err := srv.dbiface.UpdatePlayerMoney(&i); err != nil {
-						return db_err_write, nil
+						return db_err_write
 					}
 					break
 				}
 			}
 		}
 	} else {
-		return db_no_players, nil
+		return db_no_players
 	}
-	return ok, &fe
+	fmt.Println(fe)
+	return ok
 }
 
 func (srv *WSServer) getPlayers(ctx *gin.Context) {
@@ -248,11 +211,12 @@ func (srv *WSServer) postPlayers(ctx *gin.Context) {
 func (ws *WSServer) handleBroadcast() {
 	for {
 		msg := <-broadcast
-		res, resp := ws.getPlayerPlay(&msg)
+		fe := Fe_resp{}
+		res := ws.getPlayerPlay(&msg, &fe)
 		if res == 0 {
 			for client, player := range clients {
-				if player.Id == resp.id {
-					err := client.WriteJSON(resp)
+				if player.Id == fe.id {
+					err := client.WriteJSON(fe)
 					if err != nil {
 						client.Close()
 						delete(clients, client)
@@ -260,5 +224,19 @@ func (ws *WSServer) handleBroadcast() {
 				}
 			}
 		}
+	}
+}
+
+func handleWebSocketConnection(conn *websocket.Conn) {
+	for {
+		var message MessageBet
+		err := conn.ReadJSON(&message)
+		if err != nil {
+			conn.Close()
+			delete(clients, conn)
+			break
+		}
+		clients[conn].Id = message.Id
+		broadcast <- message
 	}
 }

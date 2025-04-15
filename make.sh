@@ -120,6 +120,7 @@ go build  -o $request_service_name main.go
 cp gen-players.sh "../"$output
 mv $request_service_name "../"$output
 cp *.yaml "../"$output
+cp *.html "../"$output
 echo "finished"
 
 echo "end make casino all :-)"

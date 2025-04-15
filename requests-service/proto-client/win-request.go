@@ -45,6 +45,7 @@ func (wr *WinRequest) SendWin(id uint64) error {
 	if err != nil {
 		return errors.New(fmt.Sprint("could not greet: %v", err))
 	}
-	log.Printf("CryptoWin Proto : %s %d", wr.PlayerResponse.GetName(), wr.PlayerResponse.GetMoneyWon())
+	log.Printf("CryptoWin Proto : %d %d %v", wr.PlayerResponse.GetId(),
+		wr.PlayerResponse.GetMoneyWon(), wr.PlayerResponse.GetLines())
 	return nil
 }
