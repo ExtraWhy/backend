@@ -14,7 +14,7 @@ fi
 
 login_service_name="user-service"
 request_service_name="requests-service"
-proto_service="proto-player-service"
+proto_service="game-service"
 proto_client="proto-player-client"
 
 
@@ -92,8 +92,8 @@ echo "--------------------------------------------------------------------------
 
 mkdir $output
 
-echo "Prepare proto service "
-cd proto-player-serv
+echo "Prepare game service "
+cd game-service
 update_go
 
 go build -o $proto_service main.go
