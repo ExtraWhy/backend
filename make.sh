@@ -15,7 +15,6 @@ fi
 login_service_name="user-service"
 request_service_name="requests-service"
 proto_service="game-service"
-proto_client="proto-player-client"
 
 
 internal_libs=""
@@ -101,18 +100,6 @@ mv $proto_service "../"$output
 cp *.sh "../"$output
 echo "finished"
 cd ..
-
-
-#removed for now
-#echo "Prepare proto client "
-#cd proto-player-client
-#update_go
-#
-#go build -o $proto_client main.go
-#mv $proto_client "../"$output
-#echo "finished"
-#cd ..
-
 
 
 echo "Prepare user service"
