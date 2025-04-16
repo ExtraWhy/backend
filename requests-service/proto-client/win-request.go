@@ -5,10 +5,12 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"log"
+	"sync"
 	"time"
 
+	"github.com/ExtraWhy/internal-libs/logger"
 	pb "github.com/ExtraWhy/internal-libs/proto-models"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -20,7 +22,16 @@ const (
 var (
 	addr = flag.String("addr", "localhost:50051", "the address to connect to")
 	name = flag.String("Name", defaultName, "Name to greet")
+	zl   = logger.ZapperLog{}
+	do   sync.Once
 )
+
+func log(level int, m string, zpf ...zap.Field) {
+	do.Do(func() {
+		zl.Init(1)
+	})
+	zl.Log(level, m, zpf...)
+}
 
 type WinRequest struct {
 	PlayerRequest  *pb.PlayerRequest
@@ -45,7 +56,8 @@ func (wr *WinRequest) SendWin(id uint64) error {
 	if err != nil {
 		return errors.New(fmt.Sprint("could not greet: %v", err))
 	}
-	log.Printf("CryptoWin Proto : %d %d %v", wr.PlayerResponse.GetId(),
-		wr.PlayerResponse.GetMoneyWon(), wr.PlayerResponse.GetLines())
+	log(1, "cryptowin proto", zap.Uint64("id", wr.PlayerResponse.GetId()),
+		zap.Uint64("won", wr.PlayerResponse.GetMoneyWon()),
+		zap.ByteString("lines", wr.PlayerResponse.GetLines()))
 	return nil
 }
