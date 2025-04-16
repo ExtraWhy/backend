@@ -15,7 +15,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var allNodesWaitGroup sync.WaitGroup
+var (
+	allNodesWaitGroup sync.WaitGroup
+)
 
 type Server struct {
 	Host    string
@@ -130,7 +132,6 @@ func (srv *Server) getWinners(ctx *gin.Context) {
 	if playercache.CacheSize() > 0 {
 		playercache.DropThem()
 		pl := playercache.GetThem()
-		fmt.Println(pl)
 		ctx.IndentedJSON(http.StatusOK, pl)
 		return
 	}

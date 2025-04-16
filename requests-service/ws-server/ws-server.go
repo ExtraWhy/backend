@@ -81,11 +81,11 @@ func (srv *WSServer) DoRun(conf *config.RequestService) error {
 		srv.dbiface.(*db.DBSqlConnection).CreatePlayersTable()
 	}
 
-	//	srv.router.Use(cors.New(cors.Config{
-	//		AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend
-	//		AllowMethods: []string{"GET", "POST", "OPTIONS"},
-	//		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
-	//	}))
+	//srv.router.Use(cors.New(cors.Config{
+	//	AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend
+	//	AllowMethods: []string{"GET", "POST", "OPTIONS"},
+	//	AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
+	//}))
 
 	srv.router.GET("/ws", func(c *gin.Context) {
 		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)

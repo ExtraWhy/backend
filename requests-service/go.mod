@@ -6,13 +6,11 @@ require (
 	github.com/ExtraWhy/internal-libs v0.0.0-20250416090909-cc1e2a75108f
 	github.com/gin-contrib/cors v1.7.4
 	github.com/gin-gonic/gin v1.10.0
+	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.71.1
 )
 
-require (
-	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.27.0 // indirect
-)
+require go.uber.org/multierr v1.11.0 // indirect
 
 require (
 	github.com/bytedance/sonic v1.13.2 // indirect
