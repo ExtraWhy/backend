@@ -10,7 +10,7 @@ import (
 	"sync"
 
 	"github.com/ExtraWhy/internal-libs/logger"
-	pb "github.com/ExtraWhy/internal-libs/proto-models"
+	pb "github.com/ExtraWhy/internal-libs/proto-models/player"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )

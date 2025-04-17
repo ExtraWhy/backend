@@ -24,7 +24,9 @@ internal_libs_player=""
 internal_libs_user=""
 internal_libs_games=""
 internal_libs_config=""
-internal_libs_proto_models=""
+internal_libs_proto_player=""
+internal_libs_proto_user=""
+
 arg1=
 
 function defaults() {
@@ -36,7 +38,9 @@ function defaults() {
 	internal_libs_games="github.com/ExtraWhy/internal-libs/models/games"
 	internal_libs_user="github.com/ExtraWhy/internal-libs/models/user"
 	internal_libs_config="github.com/ExtraWhy/internal-libs/config"
-	internal_libs_proto_models="github.com/ExtraWhy/internal-libs/proto-models"
+	internal_libs_proto_player="github.com/ExtraWhy/internal-libs/proto-models/player"
+	internal_libs_proto_user="github.com/ExtraWhy/internal-libs/proto-models/user"
+	
 }
 
 function update_go() {
@@ -50,7 +54,8 @@ else
 	go get $internal_libs_player
 	go get $internal_libs_user
 	go get $internal_libs_config
-	go get $internal_libs_proto_models
+	go get $internal_libs_proto_player
+	go get $internal_libs_proto_user
 	go mod tidy	
 fi
 	
@@ -74,7 +79,8 @@ else
 		internal_libs_user="github.com/ExtraWhy/internal-libs/models/user@"$1
 		internal_libs_games="github.com/ExtraWhy/internal-libs/models/games@"$1
 		internal_libs_config="github.com/ExtraWhy/internal-libs/config@"$1
-		internal_libs_proto_models="github.com/ExtraWhy/internal-libs/proto-models@"$1
+		internal_libs_proto_player="github.com/ExtraWhy/internal-libs/proto-models/player@"$1
+		internal_libs_proto_user="github.com/ExtraWhy/internal-libs/proto-models/user@"$1		
 	fi
 	
 fi
@@ -86,7 +92,8 @@ echo $internal_libs_player
 echo $internal_libs_user
 echo $internal_libs_config
 echo $internal_libs_games
-echo $internal_libs_proto_models
+echo $internal_libs_proto_player
+echo $internal_libs_proto_user
 echo "--------------------------------------------------------------------------------"
 
 mkdir $output
