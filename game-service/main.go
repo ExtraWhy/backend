@@ -43,9 +43,9 @@ func (s *server) GetWinForPlayer(ctx context.Context, in *pb.PlayerRequest) (*pb
 	autor.MoneyWon = &m0
 	autor.Id = &id
 	autor.Lines = lines
-	for i := 0; i < 5; i++ {
-		for j := 0; j < 3; j++ {
-			autor.Reels = append(autor.Reels, byte(reels[i][j]))
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 5; j++ {
+			autor.Reels = append(autor.Reels, byte(reels[j][i]))
 		}
 	}
 	if lines != nil {
