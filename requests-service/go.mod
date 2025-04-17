@@ -3,11 +3,14 @@ module casino/rest-backend
 go 1.24.1
 
 require (
-	github.com/ExtraWhy/internal-libs v0.0.0-20250415123118-259df126daa6
+	github.com/ExtraWhy/internal-libs v0.0.0-20250417081201-d273bee1be51
 	github.com/gin-contrib/cors v1.7.4
 	github.com/gin-gonic/gin v1.10.0
+	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.71.1
 )
+
+require go.uber.org/multierr v1.11.0 // indirect
 
 require (
 	github.com/bytedance/sonic v1.13.2 // indirect
@@ -25,7 +28,6 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-sqlite3 v1.14.24 // indirect

@@ -3,11 +3,13 @@ module proto/player/server
 go 1.24.1
 
 require (
-	github.com/ExtraWhy/internal-libs v0.0.0-20250415123118-259df126daa6
+	github.com/ExtraWhy/internal-libs v0.0.0-20250417081201-d273bee1be51
+	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.71.1
 )
 
 require (
+	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect

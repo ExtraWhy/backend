@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	feresponse "casino/rest-backend/models"
 	playercache "casino/rest-backend/player-cache"
 	server "casino/rest-backend/proto-client"
 	"fmt"
@@ -31,13 +32,6 @@ const (
 	unknownw      = 0xff
 )
 
-type Fe_resp struct {
-	id    uint64
-	Won   uint64  `json:"won"`
-	Name  string  `json:"name"`
-	Lines []uint8 `json:"lines"`
-}
-
 type cachedPlayer struct {
 	Hits uint64
 	Pl   player.Player
@@ -50,10 +44,6 @@ type skv struct {
 type MessageBet struct {
 	Id    uint64 `json:"id"`
 	Money uint64 `json:"money"`
-}
-
-type MessageLogin struct {
-	Id uint64 `json:"id"`
 }
 
 var clients = make(map[*websocket.Conn]*player.Player)
@@ -81,11 +71,11 @@ func (srv *WSServer) DoRun(conf *config.RequestService) error {
 		srv.dbiface.(*db.DBSqlConnection).CreatePlayersTable()
 	}
 
-	//	srv.router.Use(cors.New(cors.Config{
-	//		AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend
-	//		AllowMethods: []string{"GET", "POST", "OPTIONS"},
-	//		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
-	//	}))
+	//srv.router.Use(cors.New(cors.Config{
+	//	AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend
+	//	AllowMethods: []string{"GET", "POST", "OPTIONS"},
+	//	AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
+	//}))
 
 	srv.router.GET("/ws", func(c *gin.Context) {
 		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
@@ -103,13 +93,13 @@ func (srv *WSServer) DoRun(conf *config.RequestService) error {
 	return srv.router.Run(hp)
 }
 
-func (srv *WSServer) getPlayerPlay(msg *MessageBet, fe *Fe_resp) uint {
+func (srv *WSServer) getPlayerPlay(msg *MessageBet, fe *feresponse.Fe_resp) uint {
 
 	players := srv.dbiface.DisplayPlayers()
-	fe.id = msg.Id
+	fe.Id = msg.Id
 	if len(players) > 0 {
 		for _, i := range players {
-			if i.Id == fe.id {
+			if i.Id == fe.Id {
 				if i.Money < msg.Money {
 					return no_money
 				}
@@ -129,6 +119,8 @@ func (srv *WSServer) getPlayerPlay(msg *MessageBet, fe *Fe_resp) uint {
 					} else {
 						i.Money = i.Money - msg.Money
 					}
+					fe.Reels = srv.winReq.PlayerResponse.GetReels()
+
 					if _, err := srv.dbiface.UpdatePlayerMoney(&i); err != nil {
 						return db_err_write
 					}
@@ -211,11 +203,11 @@ func (srv *WSServer) postPlayers(ctx *gin.Context) {
 func (ws *WSServer) handleBroadcast() {
 	for {
 		msg := <-broadcast
-		fe := Fe_resp{}
+		fe := feresponse.Fe_resp{}
 		res := ws.getPlayerPlay(&msg, &fe)
 		if res == 0 {
 			for client, player := range clients {
-				if player.Id == fe.id {
+				if player.Id == fe.Id {
 					err := client.WriteJSON(fe)
 					if err != nil {
 						client.Close()

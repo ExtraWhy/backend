@@ -1,8 +1,6 @@
 package gametest
 
 import (
-	"errors"
-	"log"
 	"math/rand"
 	"proto/player/server/bitvector"
 	"sync"
@@ -30,7 +28,7 @@ func bvecInst() *bitvector.Bitvector {
 }
 
 // check win and position
-func check_help2(a [5][3]uint16, g *games.Game) []uint8 {
+func check_help2(a [5][3]uint16, g *games.Game) ([]uint8, [5][3]uint16) {
 	var i, l = 0, 0
 	for l = 0; l < 10; l++ {
 		for i = 0; i < 5 && a[i][g.Lines[l][i]] == a[0][g.Lines[l][0]]; i++ {
@@ -39,11 +37,12 @@ func check_help2(a [5][3]uint16, g *games.Game) []uint8 {
 			bvecInst().Add(l)
 		}
 	}
-	return bvecInst().Indices()
+
+	return bvecInst().Indices(), a
 }
 
 // slide window by 1 back 1 forth [-1 , rand element , +1]
-func check_help1(a []uint16, g *games.Game) []uint8 {
+func check_help1(a []uint16, g *games.Game) ([]uint8, [5][3]uint16) {
 
 	var m1 = [5][3]uint16{}
 	for i := 0; i < 5; i++ {
@@ -73,12 +72,9 @@ func SetupGame(b bool) {
 	}
 }
 
-func CheckWin(a []uint16, g *games.Game) ([]uint8, error) {
+func CheckWin(a []uint16, g *games.Game) ([]uint8, [5][3]uint16) {
 
-	if len(a) != 5 {
-		return nil, errors.New("logical error, array must be 5 elements")
-	}
-	return check_help1(a, g), nil
+	return check_help1(a, g)
 }
 
 func rand_eng(min, max int) int {
@@ -86,23 +82,22 @@ func rand_eng(min, max int) int {
 	return rand.Intn(max-min+1) + min
 }
 
-func RollLines() (uint64, []uint8) {
+func RollLines() (uint64, []uint8, [5][3]uint16) {
 	var data = make([]uint16, 5)
 	var multiplyer uint64
 	for j := 0; j < 5; j++ {
 		ridx := rand_eng(0, len(gameMode.Reels[j])-1)
 		data[j] = uint16(ridx)
 	}
-	if res, err := CheckWin(data, gameMode); err != nil {
-		bvecInst().Reset()
-		log.Fatal("Exception in logic", err)
-	} else {
+	res, symb := CheckWin(data, gameMode)
+	bvecInst().Reset()
+	if len(res) > 0 {
 		for i := 0; i < len(res); i++ {
 			multiplyer += paytable[res[i]]
 		}
-		bvecInst().Reset()
-		return multiplyer, res
+		return multiplyer, res, symb
+
 	}
-	bvecInst().Reset()
-	return 1, nil
+	return multiplyer, res, symb
+
 }
