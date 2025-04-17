@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/ExtraWhy/internal-libs/logger"
-	pb "github.com/ExtraWhy/internal-libs/proto-models"
+	pb "github.com/ExtraWhy/internal-libs/proto-models/player"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -20,6 +20,7 @@ const (
 )
 
 var (
+	//todo : change make it configurable
 	addr = flag.String("addr", "localhost:50051", "the address to connect to")
 	name = flag.String("Name", defaultName, "Name to greet")
 	zl   = logger.ZapperLog{}
