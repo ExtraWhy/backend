@@ -1,5 +1,5 @@
-github.com/ExtraWhy/internal-libs v0.0.0-20250417093759-d7959fdc463a h1:BORJz0+rb59kgWyWjhzWKFP0CY7q7QvSfrUrhEiFoNU=
-github.com/ExtraWhy/internal-libs v0.0.0-20250417093759-d7959fdc463a/go.mod h1:R8XJ+ADi/ve96fzE4Pavo+V1xeNyE91IV4haV3hf43I=
+github.com/ExtraWhy/internal-libs v0.0.0-20250417094133-80a22b17cfd0 h1:4BDHEJZ31PZc+MXRITvpG/LZR7zx6HTO8Y2cbmUUx/U=
+github.com/ExtraWhy/internal-libs v0.0.0-20250417094133-80a22b17cfd0/go.mod h1:R8XJ+ADi/ve96fzE4Pavo+V1xeNyE91IV4haV3hf43I=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-logr/logr v1.4.2 h1:6pFjapn8bFcIbiKo3XT4j/BhANplGihG6tvd+8rYgrY=
