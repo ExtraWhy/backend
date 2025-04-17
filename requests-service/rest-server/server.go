@@ -1,6 +1,7 @@
 package server
 
 import (
+	feresponse "casino/rest-backend/models"
 	playercache "casino/rest-backend/player-cache"
 	server "casino/rest-backend/proto-client"
 	"fmt"
@@ -56,12 +57,6 @@ func (srv *Server) DoRun(conf *config.RequestService) error {
 	return srv.router.Run(hp)
 }
 
-type Fe_resp struct {
-	Won   uint64  `json:"won"`
-	Name  string  `json:"name"`
-	Lines []uint8 `json:"lines"`
-}
-
 func (srv *Server) getPlayerPlay(gct *gin.Context) {
 	allNodesWaitGroup.Add(1)
 	go func(s *Server, ctx *gin.Context) {
@@ -88,7 +83,7 @@ func (srv *Server) getPlayerPlay(gct *gin.Context) {
 						ctx.IndentedJSON(http.StatusBadGateway, gin.H{"message": "Fail to talk to the game service"})
 						break
 					} else {
-						fe := Fe_resp{Name: i.Name,
+						fe := feresponse.Fe_resp{Name: i.Name,
 							Won: srv.winReq.PlayerResponse.GetMoneyWon(),
 						}
 						if fe.Won > 0 {

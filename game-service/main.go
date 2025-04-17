@@ -36,15 +36,20 @@ type server struct {
 func (s *server) GetWinForPlayer(ctx context.Context, in *pb.PlayerRequest) (*pb.PlayerResponse, error) {
 	var m0 uint64 = 0
 	v := fmt.Sprintf("%s ", in.GetName())
-	mult, lines := gametest.RollLines()
+	mult, lines, reels := gametest.RollLines()
 	id := in.GetId()
 	autor := &pb.PlayerResponse{}
 	autor.Name = &v
 	autor.MoneyWon = &m0
 	autor.Id = &id
+	autor.Lines = lines
+	for i := 0; i < 5; i++ {
+		for j := 0; j < 3; j++ {
+			autor.Reels = append(autor.Reels, byte(reels[i][j]))
+		}
+	}
 	if lines != nil {
 		autor.MoneyWon = &mult
-		autor.Lines = lines
 	}
 	return autor, nil
 }
@@ -53,24 +58,25 @@ func main() {
 
 	if len(os.Args) > 1 && os.Args[1] == "t" {
 		gametest.SetupGame(true)
-		log(1, "setting up game in test mode (very high win ratio)")
+		log(logger.DEV, "setting up game in test mode (very high win ratio)")
 	} else {
-		log(1, "setting up game in normal mode (normal win ratio)")
+		log(logger.DEV, "setting up game in normal mode (normal win ratio)")
 		gametest.SetupGame(false)
 	}
 
 	flag.Parse()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
-		log(3, "failed to listen", zap.String("address", lis.Addr().String()))
+		log(logger.CRITICAL, "failed to listen", zap.String("address", lis.Addr().String()))
+		os.Exit(-1)
 		//Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
 	srv := &server{}
 	pb.RegisterServiceGameWonServer(s, srv)
-	log(1, "server listening", zap.String("addres", lis.Addr().String()))
 	if err := s.Serve(lis); err != nil {
-		log(3, "failed to listen", zap.String("address", lis.Addr().String()))
-
+		log(logger.CRITICAL, "failed to listen", zap.String("address", lis.Addr().String()))
+		os.Exit(-1)
 	}
+	log(logger.DEV, "server listening", zap.String("addres", lis.Addr().String()))
 }

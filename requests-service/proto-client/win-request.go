@@ -56,8 +56,9 @@ func (wr *WinRequest) SendWin(id uint64) error {
 	if err != nil {
 		return errors.New(fmt.Sprint("could not greet: %v", err))
 	}
-	log(1, "cryptowin proto", zap.Uint64("id", wr.PlayerResponse.GetId()),
+	log(logger.DEBUG, "cryptowin proto", zap.Uint64("id", wr.PlayerResponse.GetId()),
 		zap.Uint64("won", wr.PlayerResponse.GetMoneyWon()),
-		zap.ByteString("lines", wr.PlayerResponse.GetLines()))
+		zap.ByteString("lines", wr.PlayerResponse.GetLines()),
+		zap.ByteString("reels", wr.PlayerResponse.GetReels()))
 	return nil
 }
