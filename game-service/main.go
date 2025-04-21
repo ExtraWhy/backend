@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os"
-	gametest "proto/player/server/game-test"
+	gametest "proto/player/server/gamble"
 	"sync"
 
 	"github.com/ExtraWhy/internal-libs/logger"
