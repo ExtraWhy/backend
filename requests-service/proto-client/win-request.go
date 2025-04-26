@@ -35,8 +35,31 @@ func log(level int, m string, zpf ...zap.Field) {
 }
 
 type WinRequest struct {
-	PlayerRequest  *pb.PlayerRequest
-	PlayerResponse *pb.PlayerResponse
+	PlayerRequest     *pb.PlayerRequest
+	PlayerResponse    *pb.PlayerResponse
+	CleopatraResponse *pb.CleopatraWins
+}
+
+func (wr *WinRequest) SendWin4Cleo(id uint64) error {
+	flag.Parse()
+	// Set up a connection to the server.
+	conn, err := grpc.NewClient(*addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return errors.New("No connection to game service ")
+	}
+	defer conn.Close()
+	c := pb.NewServiceGameWonClient(conn)
+
+	// Contact the server and print out its response.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	pr := &pb.PlayerRequest{Id: &id}
+	wr.CleopatraResponse, err = c.GetWinForCleopatra(ctx, pr) //IVZ
+	if err != nil {
+		return errors.New(fmt.Sprint("could not greet: %v", err))
+	}
+
+	return nil
 }
 
 func (wr *WinRequest) SendWin(id uint64) error {
@@ -53,7 +76,7 @@ func (wr *WinRequest) SendWin(id uint64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	pr := &pb.PlayerRequest{Id: &id}
-	wr.PlayerResponse, err = c.GetWinForPlayer(ctx, pr)
+	wr.PlayerResponse, err = c.GetWinForPlayer(ctx, pr) //IVZ
 	if err != nil {
 		return errors.New(fmt.Sprint("could not greet: %v", err))
 	}

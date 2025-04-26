@@ -1,8 +1,10 @@
-package gametest
+package slot
 
 import (
 	"math/rand"
 	"proto/player/server/bitvector"
+	"proto/player/server/cleopatra"
+	"proto/player/server/slots"
 	"sync"
 	"time"
 
@@ -11,12 +13,8 @@ import (
 
 var gameMode *games.Game
 var (
-	bvec     *bitvector.Bitvector
-	once     sync.Once
-	paytable = []uint64{50, 100, 50,
-		25, 25, 25,
-		20, 20, 20,
-		10, 10, 10, 5}
+	bvec *bitvector.Bitvector
+	once sync.Once
 )
 
 func bvecInst() *bitvector.Bitvector {
@@ -27,26 +25,37 @@ func bvecInst() *bitvector.Bitvector {
 	return bvec
 }
 
+// check wilds/scatter/lines
+func check_help3(a, b, wildscat uint8) bool {
+	return a == b || b == wildscat
+}
+
 // check win and position
-func check_help2(a [5][3]uint16, g *games.Game) ([]uint8, [5][3]uint16) {
-	var i, l = 0, 0
-	for l = 0; l < 10; l++ {
-		for i = 0; i < 5 && a[i][g.Lines[l][i]] == a[0][g.Lines[l][0]]; i++ {
+func check_help2(a [5][3]uint8, g *games.Game) ([]uint8, [5][3]uint8) {
+	var scat, i, l = 0, 0, 0
+	var lenl = len(g.Lines)
+	for l = 0; l < lenl; l++ {
+		//		for i = 0; i < 5 && a[i][g.Lines[l][i]-1] == a[0][g.Lines[l][0]-1]; i++ {
+		//		}
+		for i = 0; i < 5 && check_help3(a[i][g.Lines[l][i]-1], a[0][g.Lines[l][0]-1], 13); i++ {
+		}
+		for scat = 0; scat < 5 && check_help3(a[scat][g.Lines[l][scat]-1], a[0][g.Lines[l][0]-1], 1); scat++ {
 		}
 		if i == 5 {
 			bvecInst().Add(l)
 		}
+
 	}
 
 	return bvecInst().Indices(), a
 }
 
 // slide window by 1 back 1 forth [-1 , rand element , +1]
-func check_help1(a []uint16, g *games.Game) ([]uint8, [5][3]uint16) {
+func check_help1(a []uint8, g *games.Game) ([]uint8, [5][3]uint8) {
 
-	var m1 = [5][3]uint16{}
+	var m1 = [5][3]uint8{}
 	for i := 0; i < 5; i++ {
-		if a[i] >= uint16(len(g.Reels[0]))-1 {
+		if a[i] >= uint8(len(g.Reels[0]))-1 {
 			m1[i][0] = g.Reels[i][a[i]-1]
 			m1[i][1] = g.Reels[i][a[i]]
 			m1[i][2] = g.Reels[i][0]
@@ -72,7 +81,7 @@ func SetupGame(b bool) {
 	}
 }
 
-func CheckWin(a []uint16, g *games.Game) ([]uint8, [5][3]uint16) {
+func CheckWin(a []uint8, g *games.Game) ([]uint8, [5][3]uint8) {
 
 	return check_help1(a, g)
 }
@@ -82,18 +91,27 @@ func rand_eng(min, max int) int {
 	return rand.Intn(max-min+1) + min
 }
 
-func RollLines() (uint64, []uint8, [5][3]uint16) {
-	var data = make([]uint16, 5)
+func CleopatraSpin(bet uint64) *slots.Wins {
+	var wins slots.Wins
+	cl := cleopatra.NewGame()
+	cl.Spin(99)
+	cl.Scanner(&wins)
+	return &wins
+}
+
+func RollLines() (uint64, []uint8, [5][3]uint8) {
+	var data = make([]uint8, 5)
+
 	var multiplyer uint64
 	for j := 0; j < 5; j++ {
 		ridx := rand_eng(0, len(gameMode.Reels[j])-1)
-		data[j] = uint16(ridx)
+		data[j] = uint8(ridx)
 	}
 	res, symb := CheckWin(data, gameMode)
 	bvecInst().Reset()
 	if len(res) > 0 {
 		for i := 0; i < len(res); i++ {
-			multiplyer += paytable[res[i]]
+			multiplyer += uint64(gameMode.LinePay[0][3]) // take fixed paytable for now
 		}
 		return multiplyer, res, symb
 

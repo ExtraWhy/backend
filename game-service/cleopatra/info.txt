@@ -1,0 +1,7 @@
+//ivz hints 
+out wins 
+game.Prepare()
+game.Spin(99)
+game.Scanner(&wins)
+game.Spawn(wins, money, 99)
+wins.Reset()
