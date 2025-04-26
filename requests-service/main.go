@@ -4,10 +4,9 @@ import (
 	server "casino/rest-backend/rest-server"
 	servinterface "casino/rest-backend/serv-interface"
 	websocket "casino/rest-backend/ws-server"
-	"sync"
-
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/ExtraWhy/internal-libs/config"
 	"github.com/ExtraWhy/internal-libs/logger"

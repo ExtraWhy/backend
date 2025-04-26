@@ -3,7 +3,7 @@ module proto/player/server
 go 1.24.1
 
 require (
-	github.com/ExtraWhy/internal-libs v0.0.0-20250421084137-2ccba1575d24
+	github.com/ExtraWhy/internal-libs v0.0.0-20250426133905-7cf5866bb91b
 	github.com/slotopol/server v0.9.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.71.1

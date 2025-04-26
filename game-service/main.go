@@ -33,13 +33,45 @@ type server struct {
 	pb.UnimplementedServiceGameWonServer
 }
 
+func (s *server) GetWinForCleopatra(context.Context, *pb.PlayerRequest) (*pb.CleopatraWins, error) {
+
+	retwins := pb.CleopatraWins{}
+	retwins.Wins = make([]*pb.CleopatraWin, 20)
+	var i = 0
+	wins := gametest.CleopatraSpin(100)
+
+	for _, j := range *wins {
+		bid := uint32(j.BID)
+		free := uint32(j.Free)
+		jid := uint32(j.JID)
+		jack := float32(j.Jack)
+		line := uint32(j.Line)
+		mult := float32(j.Mult)
+		pay := float32(j.Pay)
+		retwins.Wins[i] = &pb.CleopatraWin{}
+		retwins.Wins[i].BID = &bid
+		retwins.Wins[i].Free = &free
+		retwins.Wins[i].JID = &jid
+		retwins.Wins[i].Jack = &jack
+		retwins.Wins[i].Line = &line
+		retwins.Wins[i].Mult = &mult
+		retwins.Wins[i].Pay = &pay
+
+		for h := 0; h < len(j.XY); h++ {
+			retwins.Wins[i].Linex = append(retwins.Wins[i].Linex, uint32(j.XY[h]))
+		}
+		i++
+
+	}
+	return &retwins, nil
+
+}
+
 func (s *server) GetWinForPlayer(ctx context.Context, in *pb.PlayerRequest) (*pb.PlayerResponse, error) {
 	var m0 uint64 = 0
 	v := fmt.Sprintf("%s ", in.GetName())
 	mult, lines, reels := gametest.RollLines()
 	//test cleao
-	wins := gametest.CleopatraSpin(100)
-	fmt.Println(wins)
 
 	id := in.GetId()
 	autor := &pb.PlayerResponse{}
