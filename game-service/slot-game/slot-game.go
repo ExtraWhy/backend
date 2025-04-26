@@ -1,8 +1,10 @@
-package gamble
+package slot
 
 import (
 	"math/rand"
 	"proto/player/server/bitvector"
+	"proto/player/server/cleopatra"
+	"proto/player/server/slots"
 	"sync"
 	"time"
 
@@ -13,7 +15,6 @@ var gameMode *games.Game
 var (
 	bvec *bitvector.Bitvector
 	once sync.Once
-	do   sync.Once
 )
 
 func bvecInst() *bitvector.Bitvector {
@@ -24,16 +25,26 @@ func bvecInst() *bitvector.Bitvector {
 	return bvec
 }
 
+// check wilds/scatter/lines
+func check_help3(a, b, wildscat uint8) bool {
+	return a == b || b == wildscat
+}
+
 // check win and position
 func check_help2(a [5][3]uint8, g *games.Game) ([]uint8, [5][3]uint8) {
-	var i, l = 0, 0
+	var scat, i, l = 0, 0, 0
 	var lenl = len(g.Lines)
 	for l = 0; l < lenl; l++ {
-		for i = 0; i < 5 && a[i][g.Lines[l][i]-1] == a[0][g.Lines[l][0]-1]; i++ {
+		//		for i = 0; i < 5 && a[i][g.Lines[l][i]-1] == a[0][g.Lines[l][0]-1]; i++ {
+		//		}
+		for i = 0; i < 5 && check_help3(a[i][g.Lines[l][i]-1], a[0][g.Lines[l][0]-1], 13); i++ {
+		}
+		for scat = 0; scat < 5 && check_help3(a[scat][g.Lines[l][scat]-1], a[0][g.Lines[l][0]-1], 1); scat++ {
 		}
 		if i == 5 {
 			bvecInst().Add(l)
 		}
+
 	}
 
 	return bvecInst().Indices(), a
@@ -80,6 +91,14 @@ func rand_eng(min, max int) int {
 	return rand.Intn(max-min+1) + min
 }
 
+func CleopatraSpin(bet uint64) *slots.Wins {
+	var wins slots.Wins
+	cl := cleopatra.NewGame()
+	cl.Spin(99)
+	cl.Scanner(&wins)
+	return &wins
+}
+
 func RollLines() (uint64, []uint8, [5][3]uint8) {
 	var data = make([]uint8, 5)
 
@@ -92,7 +111,7 @@ func RollLines() (uint64, []uint8, [5][3]uint8) {
 	bvecInst().Reset()
 	if len(res) > 0 {
 		for i := 0; i < len(res); i++ {
-			multiplyer += uint64(gameMode.LinePay[0][3]) // todo implement real paytable //paytable[res[i]]
+			multiplyer += uint64(gameMode.LinePay[0][3]) // take fixed paytable for now
 		}
 		return multiplyer, res, symb
 

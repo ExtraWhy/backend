@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os"
-	gametest "proto/player/server/gamble"
+	gametest "proto/player/server/slot-game"
 	"sync"
 
 	"github.com/ExtraWhy/internal-libs/logger"
@@ -37,6 +37,10 @@ func (s *server) GetWinForPlayer(ctx context.Context, in *pb.PlayerRequest) (*pb
 	var m0 uint64 = 0
 	v := fmt.Sprintf("%s ", in.GetName())
 	mult, lines, reels := gametest.RollLines()
+	//test cleao
+	wins := gametest.CleopatraSpin(100)
+	fmt.Println(wins)
+
 	id := in.GetId()
 	autor := &pb.PlayerResponse{}
 	autor.Name = &v

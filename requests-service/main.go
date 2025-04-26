@@ -4,17 +4,32 @@ import (
 	server "casino/rest-backend/rest-server"
 	servinterface "casino/rest-backend/serv-interface"
 	websocket "casino/rest-backend/ws-server"
+	"sync"
 
 	"fmt"
 	"os"
 
 	"github.com/ExtraWhy/internal-libs/config"
+	"github.com/ExtraWhy/internal-libs/logger"
+	"go.uber.org/zap"
 )
+
+var (
+	zl = logger.ZapperLog{}
+	do sync.Once
+)
+
+func log(level int, m string, zpf ...zap.Field) {
+	do.Do(func() {
+		zl.Init(logger.DEV)
+	})
+	zl.Log(level, m, zpf...)
+}
 
 func main() {
 
 	if len(os.Args) != 2 {
-		fmt.Println("Error useage : provide yaml config file")
+		log(logger.CRITICAL, "Error usage: provide config file")
 		os.Exit(-1)
 	}
 
@@ -24,16 +39,17 @@ func main() {
 	srvconf := config.RequestService{}
 	//conf.LoadConfig("requests-service.yaml", &req); err != nil {
 	if err := conf.LoadConfig(os.Args[1], &srvconf); err != nil {
+		log(logger.CRITICAL, "Failed to load config file", zap.Any("what", err))
 		fmt.Println("Failed to load cofig file")
 		os.Exit(-2)
 	}
 
 	if srvconf.ApiType == "rest" {
-		fmt.Println("--- rest server up ---")
+		log(logger.INFO, "--- rest service up ---")
 		srvIface = &server.Server{}
 		srvIface.DoRun(&srvconf)
 	} else if srvconf.ApiType == "ws" {
-		fmt.Println("--- ws server up ---")
+		log(logger.INFO, "--- websocket service up ---")
 		srvIface = &websocket.WSServer{}
 		srvIface.DoRun(&srvconf)
 	}
