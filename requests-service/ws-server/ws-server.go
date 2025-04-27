@@ -142,9 +142,16 @@ func (srv *WSServer) getPlayerPlayCleo(msg *MessageBet, fer *feresponse.Fe_resp_
 		return unknownw
 	} else {
 		var j = 0
+		for x := 0; x < 5; x++ {
+			for y := 0; y < 3; y++ {
+				fer.Scr[x][y] = srv.winReq.CleopatraResponse.Syms[x*3+y]
+			}
+		}
+		fer.Cleo = make([]feresponse.Fe_resp_cleo, len(srv.winReq.CleopatraResponse.Wins))
 		for i := range srv.winReq.CleopatraResponse.Wins {
-			fer.Cleo[j].Linex = make([]uint32, 2)
-			fer.Cleo[j].Num = make([]uint32, 2)
+
+			fer.Cleo[j].XY = make([]uint32, 1)
+			fer.Cleo[j].Num = make([]uint32, 1)
 			if srv.winReq.CleopatraResponse.Wins[i].BID != nil {
 				fer.Cleo[j].BID = *srv.winReq.CleopatraResponse.Wins[i].BID
 			}
@@ -171,7 +178,7 @@ func (srv *WSServer) getPlayerPlayCleo(msg *MessageBet, fer *feresponse.Fe_resp_
 			}
 			if srv.winReq.CleopatraResponse.Wins[i].Linex != nil {
 				for k := 0; k < len(*&srv.winReq.CleopatraResponse.Wins[i].Linex); k++ {
-					fer.Cleo[j].Linex = append(fer.Cleo[j].Linex, *&srv.winReq.CleopatraResponse.Wins[i].Linex[k])
+					fer.Cleo[j].XY = append(fer.Cleo[j].XY, *&srv.winReq.CleopatraResponse.Wins[i].Linex[k])
 				}
 			}
 			j++
@@ -252,7 +259,7 @@ func (ws *WSServer) handleBroadcast() {
 		msg := <-broadcast
 		//	fe := feresponse.Fe_resp{}
 		fecleo := feresponse.Fe_resp_slots{}
-		fecleo.Cleo = make([]feresponse.Fe_resp_cleo, 20)
+		//		fecleo.Cleo = make([]feresponse.Fe_resp_cleo, 1)
 		//test		res := ws.getPlayerPlay(&msg, &fe)
 		res := ws.getPlayerPlayCleo(&msg, &fecleo)
 

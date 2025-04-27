@@ -1,6 +1,7 @@
 package slot
 
 import (
+	"fmt"
 	"math/rand"
 	"proto/player/server/bitvector"
 	"proto/player/server/cleopatra"
@@ -91,12 +92,13 @@ func rand_eng(min, max int) int {
 	return rand.Intn(max-min+1) + min
 }
 
-func CleopatraSpin(bet uint64) *slots.Wins {
+func CleopatraSpin(bet uint64) (*slots.Wins, *cleopatra.Game) {
 	var wins slots.Wins
 	cl := cleopatra.NewGame()
 	cl.Spin(99)
+	fmt.Println(cl.Scr)
 	cl.Scanner(&wins)
-	return &wins
+	return &wins, cl
 }
 
 func RollLines() (uint64, []uint8, [5][3]uint8) {
