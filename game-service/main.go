@@ -28,7 +28,6 @@ func log(level int, m string, zpf ...zap.Field) {
 	zl.Log(level, m, zpf...)
 }
 
-// server is used to implement helloworld.GreeterServer.
 type server struct {
 	pb.UnimplementedServiceGameWonServer
 }
@@ -36,9 +35,15 @@ type server struct {
 func (s *server) GetWinForCleopatra(context.Context, *pb.PlayerRequest) (*pb.CleopatraWins, error) {
 
 	retwins := pb.CleopatraWins{}
-	retwins.Wins = make([]*pb.CleopatraWin, 20)
-	var i = 0
-	wins := gametest.CleopatraSpin(100)
+	retwins.Wins = make([]*pb.CleopatraWin, 1)
+
+	wins, cl := gametest.CleopatraSpin(100)
+
+	for j := 0; j < 5; j++ {
+		for i := 0; i < 3; i++ {
+			retwins.Syms = append(retwins.Syms, int32(cl.Scr[j][i]))
+		}
+	}
 
 	for _, j := range *wins {
 		bid := uint32(j.BID)
@@ -48,19 +53,19 @@ func (s *server) GetWinForCleopatra(context.Context, *pb.PlayerRequest) (*pb.Cle
 		line := uint32(j.Line)
 		mult := float32(j.Mult)
 		pay := float32(j.Pay)
-		retwins.Wins[i] = &pb.CleopatraWin{}
-		retwins.Wins[i].BID = &bid
-		retwins.Wins[i].Free = &free
-		retwins.Wins[i].JID = &jid
-		retwins.Wins[i].Jack = &jack
-		retwins.Wins[i].Line = &line
-		retwins.Wins[i].Mult = &mult
-		retwins.Wins[i].Pay = &pay
+		retwins.Wins = append(retwins.Wins, &pb.CleopatraWin{})
+
+		retwins.Wins[len(retwins.Wins)-1].BID = &bid
+		retwins.Wins[len(retwins.Wins)-1].Free = &free
+		retwins.Wins[len(retwins.Wins)-1].JID = &jid
+		retwins.Wins[len(retwins.Wins)-1].Jack = &jack
+		retwins.Wins[len(retwins.Wins)-1].Line = &line
+		retwins.Wins[len(retwins.Wins)-1].Mult = &mult
+		retwins.Wins[len(retwins.Wins)-1].Pay = &pay
 
 		for h := 0; h < len(j.XY); h++ {
-			retwins.Wins[i].Linex = append(retwins.Wins[i].Linex, uint32(j.XY[h]))
+			retwins.Wins[len(retwins.Wins)-1].Linex = append(retwins.Wins[len(retwins.Wins)-1].Linex, uint32(j.XY[h]))
 		}
-		i++
 
 	}
 	return &retwins, nil
