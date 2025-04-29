@@ -1,7 +1,6 @@
 package server
 
 import (
-	feresponse "casino/rest-backend/models"
 	playercache "casino/rest-backend/player-cache"
 	server "casino/rest-backend/proto-client"
 	"fmt"
@@ -52,64 +51,8 @@ func (srv *Server) DoRun(conf *config.RequestService) error {
 	srv.router.GET("/players/:id", srv.getPlayerById)
 	srv.router.POST("/players", srv.postPlayers)
 	srv.router.GET("/players/winners", srv.getWinners)
-	srv.router.GET("/players/:id/bet/:m", srv.getPlayerPlay)
 	hp := fmt.Sprintf("%s:%s", conf.RestServiceHost, conf.RestServicePort)
 	return srv.router.Run(hp)
-}
-
-func (srv *Server) getPlayerPlay(gct *gin.Context) {
-	allNodesWaitGroup.Add(1)
-	go func(s *Server, ctx *gin.Context) {
-		defer allNodesWaitGroup.Done()
-		id := ctx.Param("id")
-		bet := ctx.Param("m")
-		tmp, _ := strconv.ParseUint(id, 10, 64) //TODO handle error laster
-		beti, err := strconv.ParseUint(bet, 10, 64)
-		if err != nil {
-			ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Error in bet request to bet", "err": err})
-			return
-		}
-
-		players := s.dbiface.DisplayPlayers()
-		if len(players) > 0 {
-			for _, i := range players {
-				if i.Id == tmp {
-					if i.Money < beti {
-						ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Not enough cuurencty  to bet"})
-						break
-					}
-					//do proto call
-					if err := srv.winReq.SendWin(tmp); err != nil {
-						ctx.IndentedJSON(http.StatusBadGateway, gin.H{"message": "Fail to talk to the game service"})
-						break
-					} else {
-						fe := feresponse.Fe_resp{Name: i.Name,
-							Won: srv.winReq.PlayerResponse.GetMoneyWon(),
-						}
-						if fe.Won > 0 {
-							i.Money += (fe.Won * beti)
-							tmp2 := srv.winReq.PlayerResponse.GetLines()
-							for i := 0; i < len(tmp2); i++ {
-								fe.Lines = append(fe.Lines, tmp2[i])
-							}
-							playercache.PutToCache(&i)
-						} else {
-							i.Money = i.Money - beti
-						}
-						if _, err := s.dbiface.UpdatePlayerMoney(&i); err != nil {
-							ctx.IndentedJSON(http.StatusNotAcceptable, gin.H{"message": "Fails to update player"})
-						} else {
-							ctx.IndentedJSON(http.StatusOK, fe)
-						}
-						break
-					}
-				}
-			}
-		} else {
-			ctx.IndentedJSON(http.StatusNoContent, gin.H{"message": "No players to display"})
-		}
-	}(srv, gct) //clsr
-	allNodesWaitGroup.Wait()
 }
 
 func (srv *Server) getPlayers(ctx *gin.Context) {
