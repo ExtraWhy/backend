@@ -98,6 +98,14 @@ change `api_type` to `ws` to use websockets or `rest` to use rest api (old)
 
 
 #### TODO:
-1. get last winners is still rest call
+1. ~~get last winners is still rest call~~
 2. only bet is using websocket
 3. Implement all needed for Websocket
+4. Reverse the complete response from the slots repo
+5. Adapt the response for the slot game for our case
+
+#### Slots data
+1. Data reversed from slots machine is in the format for FE:
+```
+index.html:38 Received: {"cleo":[{"XY":[0]},{"Pay":200,"Mult":2,"Sym":3,"Num":2,"Line":4,"XY":[0,1,2,0,0,0,0,0,0]},{"Pay":200,"Mult":2,"Sym":3,"Num":2,"Line":10,"XY":[0,1,2,0,0,0,0,0,0]},{"Pay":500,"Mult":2,"Sym":8,"Num":3,"Line":14,"XY":[0,2,2,1,0,0,0,0,0]}],"Scr":[[3,8,4],[11,1,10],[8,6,11],[6,9,3],[5,8,2]]}
+```
