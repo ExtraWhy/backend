@@ -3,7 +3,7 @@ module casino/rest-backend
 go 1.24.1
 
 require (
-	github.com/ExtraWhy/internal-libs v0.0.0-20250429163757-343745519430
+	github.com/ExtraWhy/internal-libs v0.0.0-20250430185142-6c4a7ceef481
 	github.com/gin-contrib/cors v1.7.4
 	github.com/gin-gonic/gin v1.10.0
 	go.uber.org/zap v1.27.0

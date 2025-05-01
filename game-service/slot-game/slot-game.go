@@ -1,7 +1,6 @@
 package slot
 
 import (
-	"fmt"
 	"math/rand"
 	"proto/player/server/bitvector"
 	"proto/player/server/cleopatra"
@@ -95,8 +94,8 @@ func rand_eng(min, max int) int {
 func CleopatraSpin(bet uint64) (*slots.Wins, *cleopatra.Game) {
 	var wins slots.Wins
 	cl := cleopatra.NewGame()
-	cl.Spin(99)
-	fmt.Println(cl.Scr)
+	cl.Bet = float64(bet) //shall not be float for us since we won't use fractional money
+	cl.Spin(99)           //99 is the rtp ratio
 	cl.Scanner(&wins)
 	return &wins, cl
 }

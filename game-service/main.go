@@ -53,6 +53,8 @@ func (s *server) GetWinForCleopatra(context.Context, *pb.PlayerRequest) (*pb.Cle
 		line := uint32(j.Line)
 		mult := float32(j.Mult)
 		pay := float32(j.Pay)
+		num := uint32(j.Num)
+		sym := uint32(j.Sym)
 		retwins.Wins = append(retwins.Wins, &pb.CleopatraWin{})
 
 		retwins.Wins[len(retwins.Wins)-1].BID = &bid
@@ -62,6 +64,8 @@ func (s *server) GetWinForCleopatra(context.Context, *pb.PlayerRequest) (*pb.Cle
 		retwins.Wins[len(retwins.Wins)-1].Line = &line
 		retwins.Wins[len(retwins.Wins)-1].Mult = &mult
 		retwins.Wins[len(retwins.Wins)-1].Pay = &pay
+		retwins.Wins[len(retwins.Wins)-1].Num = &num
+		retwins.Wins[len(retwins.Wins)-1].Sym = &sym
 
 		for h := 0; h < len(j.XY); h++ {
 			retwins.Wins[len(retwins.Wins)-1].Linex = append(retwins.Wins[len(retwins.Wins)-1].Linex, uint32(j.XY[h]))
@@ -76,7 +80,6 @@ func (s *server) GetWinForPlayer(ctx context.Context, in *pb.PlayerRequest) (*pb
 	var m0 uint64 = 0
 	v := fmt.Sprintf("%s ", in.GetName())
 	mult, lines, reels := gametest.RollLines()
-	//test cleao
 
 	id := in.GetId()
 	autor := &pb.PlayerResponse{}

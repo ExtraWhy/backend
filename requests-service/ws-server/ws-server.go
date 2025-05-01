@@ -151,7 +151,6 @@ func (srv *WSServer) getPlayerPlayCleo(msg *MessageBet, fer *feresponse.Fe_resp_
 		for i := range srv.winReq.CleopatraResponse.Wins {
 
 			fer.Cleo[j].XY = make([]uint32, 1)
-			fer.Cleo[j].Num = make([]uint32, 1)
 			if srv.winReq.CleopatraResponse.Wins[i].BID != nil {
 				fer.Cleo[j].BID = *srv.winReq.CleopatraResponse.Wins[i].BID
 			}
@@ -175,6 +174,9 @@ func (srv *WSServer) getPlayerPlayCleo(msg *MessageBet, fer *feresponse.Fe_resp_
 			}
 			if srv.winReq.CleopatraResponse.Wins[i].Sym != nil {
 				fer.Cleo[j].Sym = *srv.winReq.CleopatraResponse.Wins[i].Sym
+			}
+			if srv.winReq.CleopatraResponse.Wins[i].Num != nil {
+				fer.Cleo[j].Num = *srv.winReq.CleopatraResponse.Wins[i].Num
 			}
 			if srv.winReq.CleopatraResponse.Wins[i].Linex != nil {
 				for k := 0; k < len(*&srv.winReq.CleopatraResponse.Wins[i].Linex); k++ {
@@ -257,29 +259,20 @@ func (srv *WSServer) postPlayers(ctx *gin.Context) {
 func (ws *WSServer) handleBroadcast() {
 	for {
 		msg := <-broadcast
-		fe := feresponse.Fe_resp{}
-		//fecleo := feresponse.Fe_resp_slots{}
+		//fe := feresponse.Fe_resp{}
+		fecleo := feresponse.Fe_resp_slots{}
 		//		fecleo.Cleo = make([]feresponse.Fe_resp_cleo, 1)
-		res := ws.getPlayerPlay(&msg, &fe)
-		// res := ws.getPlayerPlayCleo(&msg, &fecleo)
+		//res := ws.getPlayerPlay(&msg, &fe)
+		res := ws.getPlayerPlayCleo(&msg, &fecleo)
 
 		if res == 0 {
 			for client, _ := range clients {
-				err := client.WriteJSON(fe)
+				err := client.WriteJSON(fecleo)
 				if err != nil {
 					client.Close()
 					delete(clients, client)
 				}
 			}
-			//for client, player := range clients {
-			//	if player.Id == fe.Id {
-			//		err := client.WriteJSON(fe)
-			//		if err != nil {
-			//			client.Close()
-			//			delete(clients, client)
-			//		}
-			//	}
-			//}
 		}
 	}
 }

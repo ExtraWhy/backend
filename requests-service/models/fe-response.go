@@ -12,7 +12,7 @@ type Fe_resp_cleo struct {
 	Pay  float32  `json:"Pay,omitempty"`
 	Mult float32  `json:"Mult,omitempty"`
 	Sym  uint32   `json:"Sym,omitempty"`
-	Num  []uint32 `json:"Num,omitempty"`
+	Num  uint32   `json:"Num,omitempty"`
 	Line uint32   `json:"Line,omitempty"`
 	XY   []uint32 `json:"XY,omitempty"`
 	Free uint32   `json:"Free,omitempty"`
