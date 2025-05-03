@@ -4,7 +4,6 @@ import (
 	server "casino/rest-backend/rest-server"
 	servinterface "casino/rest-backend/serv-interface"
 	websocket "casino/rest-backend/ws-server"
-	"fmt"
 	"os"
 	"sync"
 
@@ -29,7 +28,7 @@ func main() {
 
 	if len(os.Args) != 2 {
 		log(logger.CRITICAL, "Error usage: provide config file")
-		//	os.Exit(-1)
+		os.Exit(-1)
 	}
 
 	var conf = config.MegaConfig{}
@@ -37,7 +36,6 @@ func main() {
 	//if err := conf.LoadConfig("requests-service.yaml", &srvconf); err != nil {
 	if err := conf.LoadConfig(os.Args[1], &srvconf); err != nil {
 		log(logger.CRITICAL, "Failed to load config file", zap.Any("what", err))
-		fmt.Println("Failed to load cofig file")
 		os.Exit(-2)
 	}
 
@@ -57,7 +55,7 @@ func main() {
 		srvIface = &websocket.WSServer{}
 		if err := srvIface.DoRun(&srvconf); err != nil {
 			log(logger.CRITICAL, "Failed run websocket service", zap.Any("what", err))
-			os.Exit(-1)
+			os.Exit(-3)
 		}
 
 	}()
