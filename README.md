@@ -12,7 +12,7 @@
 
 ### Todo:
 1. Learn uber's zap logger and use it accordingly in the project
-2. Replace all printlines with `logger.ZapperLog` and use it for everything
+2. ~~Replace all printlines with `logger.ZapperLog` and use it for everything~~
 
 
 ### Protobuf server-client [deprecated soon]
@@ -22,5 +22,5 @@
 
 ### Makefile extras
 1. Run `./make.sh` with no args to build and update go modules of all projects
-2. Run `./make.sh branchname` to build and update go modules from `internal-libs` on your branchname from `internal-libs` branch
+2. Run `./make.sh <branchname>` to build and update go modules from `internal-libs` on your branchname from `internal-libs` branch
 3. Run `./make.sh -n` to only build projects with no update of go modules of `internal-libs` (local build faster)
