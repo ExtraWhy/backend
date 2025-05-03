@@ -40,7 +40,7 @@ type WinRequest struct {
 	CleopatraResponse *pb.CleopatraWins
 }
 
-func (wr *WinRequest) SendWin4Cleo(id uint64) error {
+func (wr *WinRequest) SendWin4Cleo(id, money uint64) error {
 	flag.Parse()
 	// Set up a connection to the server.
 	conn, err := grpc.NewClient(*addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -53,7 +53,7 @@ func (wr *WinRequest) SendWin4Cleo(id uint64) error {
 	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	pr := &pb.PlayerRequest{Id: &id}
+	pr := &pb.PlayerRequest{Id: &id, Bet: &money}
 	wr.CleopatraResponse, err = c.GetWinForCleopatra(ctx, pr) //IVZ
 	if err != nil {
 		return errors.New(fmt.Sprint("could not greet: %v", err))

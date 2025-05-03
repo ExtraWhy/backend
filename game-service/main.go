@@ -32,12 +32,12 @@ type server struct {
 	pb.UnimplementedServiceGameWonServer
 }
 
-func (s *server) GetWinForCleopatra(context.Context, *pb.PlayerRequest) (*pb.CleopatraWins, error) {
+func (s *server) GetWinForCleopatra(ctx context.Context, pr *pb.PlayerRequest) (*pb.CleopatraWins, error) {
 
 	retwins := pb.CleopatraWins{}
 	retwins.Wins = make([]*pb.CleopatraWin, 1)
 
-	wins, cl := gametest.CleopatraSpin(100)
+	wins, cl := gametest.CleopatraSpin(*pr.Bet)
 
 	for j := 0; j < 5; j++ {
 		for i := 0; i < 3; i++ {
