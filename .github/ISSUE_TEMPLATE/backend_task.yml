@@ -1,0 +1,53 @@
+name: Backend Task
+description: Use this form to create a backend development task
+title: "[BE] "
+labels: [backend]
+assignees:
+  - heatblazer
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: Task Summary
+      description: A one-line summary of the backend task
+      placeholder: e.g., Add endpoint for user withdrawal
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Detailed Description
+      description: Explain the logic, purpose, and scope of this task
+      placeholder: e.g., Implement a new REST endpoint with validation and JWT auth
+
+  - type: textarea
+    id: affected_modules
+    attributes:
+      label: Affected Modules / Files
+      description: Mention relevant packages, files, or services
+      placeholder: e.g., user-service, transactions.go
+
+  - type: input
+    id: db_schema
+    attributes:
+      label: Database Changes (if any)
+      description: Mention if any DB migrations or schema updates are needed
+      placeholder: e.g., Add column 'withdrawal_limit' to 'users'
+
+  - type: checkboxes
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      options:
+        - label: Code compiles and passes linting
+        - label: All unit tests pass
+        - label: Endpoint returns correct status and payload
+        - label: Added unit/integration tests
+        - label: No regressions in related logic
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Anything else useful for implementation
