@@ -132,7 +132,6 @@ func (srv *WSServer) getPlayerPlay(msg *MessageBet, fe *feresponse.CRW_Fe_resp) 
 	} else {
 		return CRW_Db_no_players
 	}
-	fmt.Println(fe)
 	return CRW_Ok
 }
 
@@ -226,7 +225,6 @@ func (srv *WSServer) getWinners(ctx *gin.Context) {
 	if playercache.CacheSize() > 0 {
 		playercache.DropThem()
 		pl := playercache.GetThem()
-		fmt.Println(pl)
 		ctx.IndentedJSON(http.StatusOK, pl)
 		return
 	}
