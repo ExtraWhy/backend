@@ -301,7 +301,9 @@ func handleWebSocketConnection(conn *websocket.Conn) {
 			delete(clients, conn)
 			break
 		}
-		clients[conn].Id = message.Id
+		if v, ok := clients[conn]; ok {
+			v.Id = message.Id
+		}
 		broadcast <- message
 	}
 }
