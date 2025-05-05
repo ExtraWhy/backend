@@ -277,15 +277,12 @@ func (srv *WSServer) postPlayers(ctx *gin.Context) {
 func (ws *WSServer) handleBroadcast() {
 	for {
 		msg := <-broadcast
-		//fe := feresponse.Fe_resp{}
-		fecleo := feresponse.CRW_Fe_resp_slots{}
-		//		fecleo.Cleo = make([]feresponse.Fe_resp_cleo, 1)
-		//res := ws.getPlayerPlay(&msg, &fe)
-		res := ws.getPlayerPlayCleo(&msg, &fecleo)
-
-		if res == 0 {
-			for client, _ := range clients {
+		for client, _ := range clients {
+			fecleo := feresponse.CRW_Fe_resp_slots{}
+			res := ws.getPlayerPlayCleo(&msg, &fecleo)
+			if res == CRW_Ok {
 				err := client.WriteJSON(fecleo)
+
 				if err != nil {
 					client.Close()
 					delete(clients, client)
