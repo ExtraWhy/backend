@@ -1,71 +1,117 @@
+<!-- AUTOPLAY 10 players simulator -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>WebSocket Client</title>
+  <title>WebSocket & REST Test</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    .panel { border: 1px solid #ccc; padding: 10px; margin: 10px 0; max-height: 200px; overflow-y: auto; }
+    h2 { margin-top: 30px; }
+    button { margin-right: 10px; padding: 8px 16px; }
+  </style>
 </head>
 <body>
-  <h2>WebSocket Client</h2>
+  <h1>WebSocket & REST Test Dashboard</h1>
 
-  <label for="id">ID (integer):</label>
-  <input type="number" id="id">
-  <br><br>
+  <button id="startBtn">Start Test</button>
+  <button id="stopBtn" disabled>Stop Test</button>
 
-  <label for="bet">Bet (integer):</label>
-  <input type="number" id="bet">
-  <br><br>
+  <h2>WebSocket Messages</h2>
+  <div id="ws-messages" class="panel"></div>
 
-
-
-  <button onclick="connectWebSocket()">Connect</button>
-  <button onclick="sendData()">Send</button>
-  <button onclick="sendLogin()">Send Login</button>
-
-  <p id="status">Status: Not connected</p>
+  <h2>REST API Response (/players/winners)</h2>
+  <div class="panel">
+    <pre id="rest-response"></pre>
+  </div>
 
   <script>
-    let socket;
+    const wsUrl = 'ws://localhost:8081/ws';
+    let wsConnections = [];
+    let wsIntervals = [];
+    let restInterval = null;
 
-    function connectWebSocket() {
-      socket = new WebSocket("ws://localhost:8081/ws");
-    
-      socket.onopen = () => {
-        document.getElementById('status').textContent = 'Status: Connected';
-        console.log('WebSocket connected');
-      };
-
-      socket.onmessage = (event) => {
-        console.log('Received:', event.data);
-      };
-
-      socket.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
-
-      socket.onclose = () => {
-        document.getElementById('status').textContent = 'Status: Disconnected';
-        console.log('WebSocket closed');
-      };
+    function logWs(msg) {
+      const div = document.getElementById('ws-messages');
+      div.innerHTML += `<div>${new Date().toLocaleTimeString()} - ${msg}</div>`;
+      div.scrollTop = div.scrollHeight;
     }
 
+    function startTest() {
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('stopBtn').disabled = false;
 
-    function sendData() {
-      if (!socket || socket.readyState !== WebSocket.OPEN) {
-        alert('WebSocket is not connected!');
-        return;
+      // Start WebSocket connections
+      for (let i = 1; i <= 10; i++) {
+        const socket = new WebSocket(wsUrl);
+        const id = i;
+
+        socket.onopen = () => {
+          logWs(`WS ${id}: Connected`);
+          const interval = setInterval(() => {
+            const payload = JSON.stringify({ id: id, money: 100 });
+            socket.send(payload);
+            logWs(`WS ${id}: Sent ${payload}`);
+          }, 1000);
+          wsIntervals.push(interval);
+        };
+
+        socket.onmessage = (event) => {
+          logWs(`WS ${id}: Received ${event.data}`);
+        };
+
+        socket.onerror = (err) => {
+          logWs(`WS ${id}: Error - ${err.message}`);
+        };
+
+        socket.onclose = () => {
+          logWs(`WS ${id}: Disconnected`);
+        };
+
+        wsConnections.push(socket);
       }
 
-      const id = parseInt(document.getElementById('id').value, 10);
-      const message = parseInt(document.getElementById('bet').value, 10);
-
-      const payload = {
-        id: id,
-        money: message
-      };
-
-      socket.send(JSON.stringify(payload));
-      console.log('Sent:', payload);
+      // Start REST polling
+      restInterval = setInterval(fetchRestData, 5000);
     }
+
+    function stopTest() {
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+
+      // Close WebSockets
+      wsConnections.forEach((socket) => {
+        socket.close();
+      });
+      wsConnections = [];
+
+      // Clear WS intervals
+      wsIntervals.forEach(clearInterval);
+      wsIntervals = [];
+
+      // Clear REST interval
+      if (restInterval) {
+        clearInterval(restInterval);
+        restInterval = null;
+      }
+
+      logWs('Test stopped.');
+    }
+
+    async function fetchRestData() {
+      try {
+        const res = await fetch('http://localhost:8082/players/winners');
+        const data = await res.text();
+        document.getElementById('rest-response').textContent = data;
+      } catch (err) {
+        document.getElementById('rest-response').textContent = 'Error: ' + err.message;
+      }
+    }
+
+    // Attach buttons
+    document.getElementById('startBtn').addEventListener('click', startTest);
+    document.getElementById('stopBtn').addEventListener('click', stopTest);
   </script>
 </body>
 </html>
+

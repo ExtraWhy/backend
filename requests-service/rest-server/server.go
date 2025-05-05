@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/ExtraWhy/internal-libs/config"
 	"github.com/ExtraWhy/internal-libs/db"
@@ -42,10 +43,19 @@ func (srv *Server) DoRun(conf *config.RequestService) error {
 		srv.dbiface.(*db.DBSqlConnection).CreatePlayersTable()
 	}
 	srv.router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend
-		AllowMethods: []string{"GET", "POST", "OPTIONS"},
-		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
+		AllowOrigins:     []string{"*"}, // or fe 3000
+		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: false,
+		MaxAge:           12 * time.Hour,
 	}))
+	//this fails to resolve cors so will leave it in case the above fix does not work with FE
+	//	srv.router.Use(cors.New(cors.Config{
+	//		AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend
+	//		AllowMethods: []string{"GET", "POST", "OPTIONS"},
+	//		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
+	//	}))
 
 	srv.router.GET("/players", srv.getPlayers)
 	srv.router.GET("/players/:id", srv.getPlayerById)
