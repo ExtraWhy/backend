@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket Pay Histogram</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h2>Live Pay Value Histogram</h2>
+  <canvas id="payHistogram" width="600" height="400"></canvas>
+
+  <script>
+    const socket = new WebSocket("ws://localhost:8081/ws");
+    const payValues = [];
+
+    const ctx = document.getElementById('payHistogram').getContext('2d');
+    const histogramChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [], // Bins
+        datasets: [{
+          label: 'Frequency',
+          data: [],
+          backgroundColor: 'rgba(54, 162, 235, 0.5)',
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: { title: { display: true, text: 'Pay Range' } },
+          y: { title: { display: true, text: 'Frequency' }, beginAtZero: true }
+        }
+      }
+    });
+
+    // Function to bin Pay values into histogram
+    function updateHistogram() {
+      const binSize = 500;
+      const maxPay = Math.max(...payValues, 10000);
+      const binCount = Math.ceil(maxPay / binSize);
+      const bins = new Array(binCount).fill(0);
+
+      payValues.forEach(val => {
+        const index = Math.floor(val / binSize);
+        bins[index]++;
+      });
+
+      const labels = bins.map((_, i) => `${i * binSize}-${(i + 1) * binSize}`);
+      histogramChart.data.labels = labels;
+      histogramChart.data.datasets[0].data = bins;
+      histogramChart.update();
+    }
+
+    socket.addEventListener('open', () => {
+      console.log('WebSocket connected.');
+
+      setInterval(() => {
+        socket.send(JSON.stringify({ id: 1, money: 100 }));
+      }, 500);
+    });
+
+    socket.addEventListener('message', (event) => {
+  try {
+    const data = JSON.parse(event.data);
+
+    if (Array.isArray(data.cleo)) {
+      data.cleo.forEach(obj => {
+        if (obj.Pay !== undefined) {
+          payValues.push(obj.Pay);
+          updateHistogram();
+        }
+      });
+    }
+  } catch (e) {
+    console.warn('Invalid message:', event.data);
+  }
+});
+    socket.addEventListener('error', (error) => {
+      console.error('WebSocket error:', error);
+    });
+
+    socket.addEventListener('close', () => {
+      console.log('WebSocket closed.');
+    });
+  </script>
+</body>
+</html>
+

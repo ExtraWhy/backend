@@ -15,6 +15,7 @@ var gameMode *games.Game
 var (
 	bvec *bitvector.Bitvector
 	once sync.Once
+	cleo *cleopatra.Game = cleopatra.NewGame()
 )
 
 func bvecInst() *bitvector.Bitvector {
@@ -93,11 +94,10 @@ func rand_eng(min, max int) int {
 
 func CleopatraSpin(bet uint64) (*slots.Wins, *cleopatra.Game) {
 	var wins slots.Wins
-	cl := cleopatra.NewGame()
-	cl.Bet = float64(bet) //shall not be float for us since we won't use fractional money
-	cl.Spin(99)           //99 is the rtp ratio
-	cl.Scanner(&wins)
-	return &wins, cl
+	cleo.Bet = float64(bet) //shall not be float for us since we won't use fractional money
+	cleo.Spin(99)           //99 is the rtp ratio
+	cleo.Scanner(&wins)
+	return &wins, cleo
 }
 
 func RollLines() (uint64, []uint8, [5][3]uint8) {
