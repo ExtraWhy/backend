@@ -149,7 +149,8 @@ func (g *Game) ScanScatters(wins *slot.Wins) {
 
 func (g *Game) Spin(mrtp float64) {
 	var reels, _ = slot.FindClosest(ReelsMap, mrtp)
-	g.ReelSpin(reels)
+	//	g.ReelSpin(reels)
+	g.ReelSpinNR(reels)
 }
 
 func (g *Game) SetSel(sel int) error {

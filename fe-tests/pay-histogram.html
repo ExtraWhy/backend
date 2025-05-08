@@ -10,6 +10,8 @@
   <canvas id="payHistogram" width="600" height="400"></canvas>
 
   <script>
+    total_games = 0
+    total_wins = 0
     const socket = new WebSocket("ws://localhost:8081/ws");
     const payValues = [];
 
@@ -35,8 +37,8 @@
 
     // Function to bin Pay values into histogram
     function updateHistogram() {
-      const binSize = 500;
-      const maxPay = Math.max(...payValues, 10000);
+      const binSize = 500
+      const maxPay = Math.max(...payValues, 100000);
       const binCount = Math.ceil(maxPay / binSize);
       const bins = new Array(binCount).fill(0);
 
@@ -68,7 +70,11 @@
         if (obj.Pay !== undefined) {
           payValues.push(obj.Pay);
           updateHistogram();
+          total_wins++;
         }
+        total_games++; 
+        console.log("total games:" + total_games + " total wins:" + total_wins)
+        
       });
     }
   } catch (e) {
