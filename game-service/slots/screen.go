@@ -347,7 +347,7 @@ func (s *Screen5x3) SetBig(big Sym) {
 
 // test copy function of ReelSpin with no randomness
 // 1 to 34 for cleopatra
-var combo = NewCombinationGenerator()
+var combo = NewCombinationGenerator(1, 34)
 
 func (s *Screen5x3) ReelSpinNR(reels Reels) {
 

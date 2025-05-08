@@ -11,6 +11,8 @@
 
   <script>
     total_games = 0
+    current_plays = 0
+    current_wins = 0
     total_wins = 0
     const socket = new WebSocket("ws://localhost:8081/ws");
     const payValues = [];
@@ -70,10 +72,11 @@
         if (obj.Pay !== undefined) {
           payValues.push(obj.Pay);
           updateHistogram();
-          total_wins++;
+          total_wins += parseInt(obj.Pay)
+          console.log("rtp: " + ((total_games / total_wins) * 100))
         }
-        total_games++; 
-        console.log("total games:" + total_games + " total wins:" + total_wins)
+        total_games+=100
+//        console.log("total games:" + total_games + " total wins:" + total_wins)
         
       });
     }

@@ -2,11 +2,12 @@ package slots
 
 type CombinationGenerator struct {
 	a, b, c, d, e int
+	RX, RY        int
 	done          bool
 }
 
-func NewCombinationGenerator() *CombinationGenerator {
-	return &CombinationGenerator{1, 1, 1, 1, 0, false}
+func NewCombinationGenerator(rangex, rangey int) *CombinationGenerator {
+	return &CombinationGenerator{rangex, rangex, rangex, rangex, 0, rangex, rangey, false}
 }
 
 func (g *CombinationGenerator) Next() ([5]int, bool) {
@@ -16,19 +17,19 @@ func (g *CombinationGenerator) Next() ([5]int, bool) {
 
 	// Advance e
 	g.e++
-	if g.e > 34 {
-		g.e = 1
+	if g.e > g.RY {
+		g.e = g.RX
 		g.d++
-		if g.d > 34 {
-			g.d = 1
+		if g.d > g.RY {
+			g.d = g.RX
 			g.c++
-			if g.c > 34 {
-				g.c = 1
+			if g.c > g.RY {
+				g.c = g.RX
 				g.b++
-				if g.b > 34 {
-					g.b = 1
+				if g.b > g.RY {
+					g.b = g.RX
 					g.a++
-					if g.a > 34 {
+					if g.a > g.RY {
 						g.done = true
 						return [5]int{}, false
 					}
