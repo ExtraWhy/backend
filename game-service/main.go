@@ -73,6 +73,7 @@ func (s *server) GetWinForCleopatra(ctx context.Context, pr *pb.PlayerRequest) (
 		}
 
 	}
+	wins.Reset()
 	return &retwins, nil
 
 }
