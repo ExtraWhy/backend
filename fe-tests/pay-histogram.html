@@ -11,6 +11,7 @@
 
   <script>
     total_games = 0
+    total_bets = 0
     current_plays = 0
     current_wins = 0
     total_wins = 0
@@ -73,9 +74,10 @@
           payValues.push(obj.Pay);
           updateHistogram();
           total_wins += parseInt(obj.Pay)
-          console.log("rtp: " + ((total_games / total_wins) * 100))
+          console.log("total games: " + total_games + " rtp: " + ((total_wins / total_bets) * 100))
         }
-        total_games+=100
+        total_bets+=100
+        total_games++
 //        console.log("total games:" + total_games + " total wins:" + total_wins)
         
       });
