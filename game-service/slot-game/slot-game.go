@@ -97,6 +97,8 @@ func CleopatraSpin(bet uint64) (*slots.Wins, *cleopatra.Game) {
 	cleo.Bet = float64(bet) //shall not be float for us since we won't use fractional money
 	cleo.Spin(99.517383)    //99 is the rtp ratio
 	cleo.Scanner(&wins)
+	cleo.Spawn(wins, float64(bet), 99.517383)
+
 	return &wins, cleo
 }
 
