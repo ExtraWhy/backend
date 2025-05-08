@@ -15,7 +15,7 @@ fi
 login_service_name="user-service"
 request_service_name="requests-service"
 proto_service="game-service"
-
+fe_tests="fe-tests"
 
 internal_libs=""
 internal_libs_db=""
@@ -97,6 +97,7 @@ echo $internal_libs_proto_user
 echo "--------------------------------------------------------------------------------"
 
 mkdir $output
+cp  $fe_tests/* $output
 
 echo "Prepare game service "
 cd game-service
@@ -127,7 +128,7 @@ go build  -o $request_service_name main.go
 cp gen-players.sh "../"$output
 mv $request_service_name "../"$output
 cp *.yaml "../"$output
-cp *.html "../"$output
 echo "finished"
+
 
 echo "end make casino all :-)"

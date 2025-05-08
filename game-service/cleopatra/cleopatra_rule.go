@@ -7,6 +7,8 @@ import (
 	slot "proto/player/server/slots"
 )
 
+var TestMode bool = false
+
 //go:embed cleopatra_reel.yaml
 var reels []byte
 
@@ -149,7 +151,11 @@ func (g *Game) ScanScatters(wins *slot.Wins) {
 
 func (g *Game) Spin(mrtp float64) {
 	var reels, _ = slot.FindClosest(ReelsMap, mrtp)
-	g.ReelSpin(reels)
+	if !TestMode {
+		g.ReelSpin(reels)
+	} else {
+		g.ReelSpinNR(reels)
+	}
 }
 
 func (g *Game) SetSel(sel int) error {

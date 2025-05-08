@@ -2,8 +2,11 @@ package slots
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/rand/v2"
 )
+
+var TestMode bool = false
 
 // Screen contains symbols rectangle of the slot game.
 // It can be with dimensions 3x1, 3x3, 4x4, 5x3, 5x4 or others.
@@ -342,6 +345,26 @@ func (s *Screen5x3) SetBig(big Sym) {
 		s.Scr[x][1] = big
 		s.Scr[x][2] = big
 	}
+}
+
+// test copy function of ReelSpin with no randomness
+// 1 to 34 for cleopatra
+var combo = NewCombinationGenerator(1, 34)
+
+func (s *Screen5x3) ReelSpinNR(reels Reels) {
+
+	var x Pos
+	if combo, ok := combo.Next(); ok {
+		i := 0
+		fmt.Println(combo)
+		for x = 1; x <= 5; x++ {
+			var reel = reels.Reel(x)
+			var hit = combo[i]
+			i++
+			s.SetCol(x, reel, hit)
+		}
+	}
+
 }
 
 func (s *Screen5x3) ReelSpin(reels Reels) {
