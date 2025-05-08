@@ -60,7 +60,7 @@
 
       setInterval(() => {
         socket.send(JSON.stringify({ id: 1, money: 100 }));
-      }, 500);
+      }, 100); //100 ms tick 
     });
 
     socket.addEventListener('message', (event) => {

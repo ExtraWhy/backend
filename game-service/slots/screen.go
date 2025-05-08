@@ -6,6 +6,8 @@ import (
 	"math/rand/v2"
 )
 
+var TestMode bool = false
+
 // Screen contains symbols rectangle of the slot game.
 // It can be with dimensions 3x1, 3x3, 4x4, 5x3, 5x4 or others.
 // (1 ,1) symbol is on left top corner.

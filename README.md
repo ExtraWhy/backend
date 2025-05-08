@@ -24,6 +24,17 @@
 2. Run `./make.sh <branchname>` to build and update go modules from `internal-libs` on your branchname from `internal-libs` branch
 3. Run `./make.sh -n` to only build projects with no update of go modules of `internal-libs` (local build faster)
 
+### Test for RTP
+1. run `./make.sh`
+2. go to `bin` folder
+3. modify `requests-service.yaml` to use `sqlite3` instead of `mongo` if you are offline, otherwise leave unchanged.
+4. run `./request-service request-service.yaml`
+5. In case you use `sqlite3` option , run `./gen-players.sh` to populate the local db with dummy players. 
+6. run `./game-service`  or `./game-service t` (t opiton os for the permuted reels test), no option is for random reels (original)
+7. open in the browser `pay-histogram.html` and press `F12` for firefox to see the console log 
+8. You may watch the histogram in the canvas and track the rtp percentage in the console log.
+
+
 ### fe-tests
 1. `multi-bet.html` creates 10 websocket clients that betting infinitely and also asks in 5 seconds for get players/winners
 2. `pay-histogram.html` - histogram of payments , bets infinitely with 100 on 1 id and plots the paytable

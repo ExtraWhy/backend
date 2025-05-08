@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"proto/player/server/cleopatra"
 	gametest "proto/player/server/slot-game"
 	"sync"
 
@@ -101,8 +102,9 @@ func (s *server) GetWinForPlayer(ctx context.Context, in *pb.PlayerRequest) (*pb
 func main() {
 
 	if len(os.Args) > 1 && os.Args[1] == "t" {
+		cleopatra.TestMode = true
 		gametest.SetupGame(true)
-		log(logger.DEV, "setting up game in test mode (very high win ratio)")
+		log(logger.DEV, "setting up game in test mode (NO RNG permute probabiliteies for reel x reel)")
 	} else {
 		log(logger.DEV, "setting up game in normal mode (normal win ratio)")
 		gametest.SetupGame(false)
