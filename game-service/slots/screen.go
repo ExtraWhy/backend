@@ -8,6 +8,10 @@ import (
 
 var TestMode bool = false
 
+// test copy function of ReelSpin with no randomness
+// 1 to 34 for cleopatra
+var combo = NewCombinationGenerator(1, 34)
+
 // Screen contains symbols rectangle of the slot game.
 // It can be with dimensions 3x1, 3x3, 4x4, 5x3, 5x4 or others.
 // (1 ,1) symbol is on left top corner.
@@ -347,10 +351,7 @@ func (s *Screen5x3) SetBig(big Sym) {
 	}
 }
 
-// test copy function of ReelSpin with no randomness
-// 1 to 34 for cleopatra
-var combo = NewCombinationGenerator(1, 34)
-
+// slot spin permute 34^5 - test only
 func (s *Screen5x3) ReelSpinNR(reels Reels) {
 
 	var x Pos

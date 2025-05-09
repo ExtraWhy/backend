@@ -13,10 +13,17 @@ import (
 
 var gameMode *games.Game
 var (
-	bvec *bitvector.Bitvector
-	once sync.Once
-	cleo *cleopatra.Game = cleopatra.NewGame()
+	bvec  *bitvector.Bitvector
+	once  sync.Once
+	once1 sync.Once
+	cleo  *cleopatra.Game = cleopatra.NewGame()
 )
+
+func set20Lines() {
+	once1.Do(func() {
+		cleo.SetSel(20)
+	})
+}
 
 func bvecInst() *bitvector.Bitvector {
 	once.Do(func() {
@@ -92,7 +99,32 @@ func rand_eng(min, max int) int {
 	return rand.Intn(max-min+1) + min
 }
 
+func CleopatraSpinV2(bet uint64) (*slots.Wins, *cleopatra.Game) {
+	set20Lines()
+	var wins slots.Wins
+	var n = 0
+	cleo.Prepare()
+	cleo.SetBet(float64(bet))
+	for { // repeat until get valid screen
+		cleo.Spin(99.517383)
+		if cleo.Scanner(&wins) == nil {
+			break
+		}
+		n++
+		if n > 300 {
+			break
+		}
+		wins.Reset()
+	}
+	cleo.Spawn(wins, float64(bet), 99.517383)
+	//debit = cost*(1-jprate/100) - wins.Gain()
+	//jack = wins.Jackpot()
+	//wins.Reset()
+	return &wins, cleo
+}
+
 func CleopatraSpin(bet uint64) (*slots.Wins, *cleopatra.Game) {
+	set20Lines()
 	var wins slots.Wins
 	cleo.Bet = float64(bet) //shall not be float for us since we won't use fractional money
 	cleo.Spin(99.517383)    //99 is the rtp ratio
