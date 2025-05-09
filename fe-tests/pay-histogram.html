@@ -83,11 +83,11 @@
           total_wins += tot;
           console.log("bet: " + b + " won: "+ tot + " total games: " + total_games + " rtp: " + ((total_wins / total_bets) * 100))
         }
-      });
-      total_bets += 100;
-      total_games++
-    
+      });    
     }
+    total_bets += 100;
+    total_games++
+
   } catch (e) {
     console.warn('Invalid message:', event.data);
   }
