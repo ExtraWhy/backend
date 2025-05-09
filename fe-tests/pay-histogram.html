@@ -75,8 +75,8 @@
     if (Array.isArray(data.cleo)) {
       data.cleo.forEach(obj => {
         if (obj.Pay !== undefined && obj.Mult !== undefined) {
-          var w = parseInt(obj.Pay)
-          var m  = parseInt(obj.Mult)
+          var w = parseInt(obj.Pay);
+          var m  = parseInt(obj.Mult);
           var tot = w * m ;
           payValues.push(tot);
           updateHistogram();
@@ -86,7 +86,7 @@
       });    
     }
     total_bets += 100;
-    total_games++
+    total_games++;
 
   } catch (e) {
     console.warn('Invalid message:', event.data);
