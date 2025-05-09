@@ -2,15 +2,29 @@ package slots
 
 import (
 	"encoding/json"
-	"fmt"
 	"math/rand/v2"
+	"sync"
+
+	"github.com/ExtraWhy/internal-libs/logger"
+	"go.uber.org/zap"
 )
 
 var TestMode bool = false
 
 // test copy function of ReelSpin with no randomness
 // 1 to 34 for cleopatra
-var combo = NewCombinationGenerator(1, 34)
+var (
+	combo = NewCombinationGenerator(1, 34)
+	zl    = logger.ZapperLog{}
+	do    sync.Once
+)
+
+func log(level int, m string, zpf ...zap.Field) {
+	do.Do(func() {
+		zl.Init(1)
+	})
+	zl.Log(level, m, zpf...)
+}
 
 // Screen contains symbols rectangle of the slot game.
 // It can be with dimensions 3x1, 3x3, 4x4, 5x3, 5x4 or others.
@@ -357,7 +371,8 @@ func (s *Screen5x3) ReelSpinNR(reels Reels) {
 	var x Pos
 	if combo, ok := combo.Next(); ok {
 		i := 0
-		fmt.Println(combo)
+		log(logger.DEV, "permute test", zap.Any("reel", combo))
+
 		for x = 1; x <= 5; x++ {
 			var reel = reels.Reel(x)
 			var hit = combo[i]
