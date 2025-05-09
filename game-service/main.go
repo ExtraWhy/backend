@@ -38,7 +38,7 @@ func (s *server) GetWinForCleopatra(ctx context.Context, pr *pb.PlayerRequest) (
 	retwins := pb.CleopatraWins{}
 	retwins.Wins = make([]*pb.CleopatraWin, 1)
 
-	wins, cl := gametest.CleopatraSpin(*pr.Bet)
+	wins, cl := gametest.CleopatraSpinV2(*pr.Bet)
 
 	for j := 0; j < 5; j++ {
 		for i := 0; i < 3; i++ {

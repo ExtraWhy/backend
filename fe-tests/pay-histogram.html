@@ -15,8 +15,12 @@
     current_plays = 0
     current_wins = 0
     total_wins = 0
+
+
+    var bIdx = 0;
     const socket = new WebSocket("ws://localhost:8081/ws");
     const payValues = [];
+
 
     const ctx = document.getElementById('payHistogram').getContext('2d');
     const histogramChart = new Chart(ctx, {
@@ -60,28 +64,30 @@
       console.log('WebSocket connected.');
 
       setInterval(() => {
-        socket.send(JSON.stringify({ id: 1, money: 100 }));
+        socket.send(JSON.stringify({ id: 1, money: 5 }));
       }, 100); //100 ms tick 
     });
 
     socket.addEventListener('message', (event) => {
   try {
     const data = JSON.parse(event.data);
-
+      var b =  100;
     if (Array.isArray(data.cleo)) {
       data.cleo.forEach(obj => {
-        if (obj.Pay !== undefined) {
-          payValues.push(obj.Pay);
+        if (obj.Pay !== undefined && obj.Mult !== undefined) {
+          var w = parseInt(obj.Pay);
+          var m  = parseInt(obj.Mult);
+          var tot = w * m ;
+          payValues.push(tot);
           updateHistogram();
-          total_wins += parseInt(obj.Pay)
-          console.log("total games: " + total_games + " rtp: " + ((total_wins / total_bets) * 100))
+          total_wins += tot;
+          console.log("bet: " + b + " won: "+ tot + " total games: " + total_games + " rtp: " + ((total_wins / total_bets) * 100))
         }
-        total_bets+=100
-        total_games++
-//        console.log("total games:" + total_games + " total wins:" + total_wins)
-        
-      });
+      });    
     }
+    total_bets += 100;
+    total_games++;
+
   } catch (e) {
     console.warn('Invalid message:', event.data);
   }
