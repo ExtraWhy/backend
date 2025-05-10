@@ -1,9 +1,10 @@
 package main
 
 import (
+	"crypto/rand"
 	"fmt"
 	"log"
-	"math"
+	"math/big"
 	"net/http"
 	"time"
 
@@ -26,12 +27,27 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 
 	log.Println("Client connected")
-	var arr = []uint64{0x123, 0x234, 0x345, 0x456, 0xdeadbeef, 0xdecafbad}
+	max := new(big.Int).SetUint64(^uint64(0))
+	// we will seed once with dev/randum crypto seed then will continue with mt
+	// assume each user session gets it's own seed it\s almst impossible or only via a bug : )
+	// to predict the outcome of the rng
+	//
+	el1, _ := rand.Int(rand.Reader, max)
+	el2, _ := rand.Int(rand.Reader, max)
+	el3, _ := rand.Int(rand.Reader, max)
+	el4, _ := rand.Int(rand.Reader, max)
+	el5, _ := rand.Int(rand.Reader, max)
+	el6, _ := rand.Int(rand.Reader, max)
+	el7, _ := rand.Int(rand.Reader, max)
+	el8, _ := rand.Int(rand.Reader, max)
+
+	var arr = []uint64{el1.Uint64(), el2.Uint64(), el3.Uint64(), el4.Uint64(),
+		el5.Uint64(), el6.Uint64(), el7.Uint64(), el8.Uint64()}
 	mt19937.Init_by_array64(arr, uint64(len(arr)))
 	//mt19937.Init_genrand64(19650218)
 	for {
 		// Simulate a number to send every 500ms
-		number := mt19937.Genrand64_int64() % math.MaxInt32
+		number := mt19937.Genrand64_int64() % 32
 
 		err := conn.WriteJSON(map[string]int{"value": int(number)})
 		if err != nil {
