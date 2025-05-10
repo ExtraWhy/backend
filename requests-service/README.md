@@ -109,3 +109,9 @@ change `api_type` to `ws` to use websockets or `rest` to use rest api (old)
 ```
 index.html:38 Received: {"cleo":[{"XY":[0]},{"Pay":200,"Mult":2,"Sym":3,"Num":2,"Line":4,"XY":[0,1,2,0,0,0,0,0,0]},{"Pay":200,"Mult":2,"Sym":3,"Num":2,"Line":10,"XY":[0,1,2,0,0,0,0,0,0]},{"Pay":500,"Mult":2,"Sym":8,"Num":3,"Line":14,"XY":[0,2,2,1,0,0,0,0,0]}],"Scr":[[3,8,4],[11,1,10],[8,6,11],[6,9,3],[5,8,2]]}
 ```
+
+
+### RNG
+1. We have to give a good seed per user session (not per game )
+2. Good approach is to seed mt19973 with dev/urandom or golangs embeded crypto/rand
+3. In real life 2 players will have different seeds so the deterministic output cannot be predicted avoiding bruteforce

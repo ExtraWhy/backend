@@ -38,3 +38,9 @@
 ### fe-tests
 1. `multi-bet.html` creates 10 websocket clients that betting infinitely and also asks in 5 seconds for get players/winners
 2. `pay-histogram.html` - histogram of payments , bets infinitely with 100 on 1 id and plots the paytable
+
+
+### RNG
+1. We have to give a good seed per user session (not per game )
+2. Good approach is to seed mt19973 with dev/urandom or golangs embeded crypto/rand
+3. In real life 2 players will have different seeds so the deterministic output cannot be predicted avoiding bruteforce
