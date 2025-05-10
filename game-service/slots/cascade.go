@@ -1,6 +1,8 @@
 package slots
 
-import "math/rand/v2"
+import (
+	"proto/player/server/util"
+)
 
 type Cascade interface {
 	Screen
@@ -61,7 +63,7 @@ func (s *Cascade5x3) RiseFall(reels Reels) {
 	var r5x = reels.(*Reels5x)
 	for x := range Pos(5) {
 		var reel = r5x[x]
-		var pos = rand.N(len(reel))
+		var pos = util.RandMT(len(reel))
 		s.SetCol(x+1, reel, pos)
 	}
 }
@@ -196,7 +198,7 @@ func (s *Cascade5x4) RiseFall(reels Reels) {
 	var r5x = reels.(*Reels5x)
 	for x := range Pos(5) {
 		var reel = r5x[x]
-		var pos = rand.N(len(reel))
+		var pos = util.RandMT(len(reel))
 		s.SetCol(x+1, reel, pos)
 	}
 }

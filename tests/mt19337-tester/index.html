@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket Histogram (32-bit Int)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h2>32-bit Integer Histogram</h2>
+  <button onclick="start()">Start</button>
+  <button onclick="stop()">Stop</button>
+  <canvas id="histogram" width="800" height="400"></canvas>
+
+  <script>
+    let socket = null;
+    let chart = null;
+
+    // Define logarithmic-style bins
+    const binRanges = [
+      [0, 1_000],
+      [1_000, 10_000],
+      [10_000, 100_000],
+      [100_000, 1_000_000],
+      [1_000_000, 10_000_000],
+      [10_000_000, 100_000_000],
+      [100_000_000, 1_000_000_000],
+      [1_000_000_000, 2_147_483_648], // up to max int32
+    ];
+    const binLabels = binRanges.map(([min, max]) => `${min.toLocaleString()}–${(max - 1).toLocaleString()}`);
+    let dataBins = new Array(binRanges.length).fill(0);
+
+    const ctx = document.getElementById('histogram').getContext('2d');
+    chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: binLabels,
+        datasets: [{
+          label: 'Value Frequency',
+          data: dataBins,
+          backgroundColor: 'rgba(40, 160, 240, 0.7)'
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Count'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Value Ranges (log scale)'
+            }
+          }
+        }
+      }
+    });
+
+    function start() {
+      if (socket) return;
+      socket = new WebSocket("ws://localhost:8080/ws");
+
+      socket.onmessage = function(event) {
+        const msg = JSON.parse(event.data);
+        const value = msg.value;
+        console.log("rng:" + value)
+        // Place value into a bin
+        for (let i = 0; i < binRanges.length; i++) {
+          const [min, max] = binRanges[i];
+          if (value >= min && value < max) {
+            dataBins[i]++;
+            break;
+          }
+        }
+
+        chart.update();
+      };
+
+      socket.onclose = () => {
+        socket = null;
+        console.log("Socket closed");
+      };
+    }
+
+    function stop() {
+      if (socket) {
+        socket.close();
+        socket = null;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -2,7 +2,7 @@ package slots
 
 import (
 	"encoding/json"
-	"math/rand/v2"
+	"proto/player/server/util"
 	"sync"
 
 	"github.com/ExtraWhy/internal-libs/logger"
@@ -118,7 +118,7 @@ func (s *Screenx) ReelSpin(reels Reels) {
 	var x Pos
 	for x = 1; x <= s.sx; x++ {
 		var reel = reels.Reel(x)
-		var hit = rand.N(len(reel))
+		var hit = util.RandMT(len(reel))
 		s.SetCol(x, reel, hit)
 	}
 }
@@ -209,7 +209,7 @@ func (s *Screen3x3) ReelSpin(reels Reels) {
 	var x Pos
 	for x = 1; x <= 3; x++ {
 		var reel = reels.Reel(x)
-		var hit = rand.N(len(reel))
+		var hit = util.RandMT(len(reel)) //rand.N(len(reel))
 		s.SetCol(x, reel, hit)
 	}
 }
@@ -284,7 +284,7 @@ func (s *Screen4x4) ReelSpin(reels Reels) {
 	var x Pos
 	for x = 1; x <= 4; x++ {
 		var reel = reels.Reel(x)
-		var hit = rand.N(len(reel))
+		var hit = util.RandMT(len(reel)) //rand.N(len(reel))
 		s.SetCol(x, reel, hit)
 	}
 }
@@ -387,7 +387,7 @@ func (s *Screen5x3) ReelSpin(reels Reels) {
 	var x Pos
 	for x = 1; x <= 5; x++ {
 		var reel = reels.Reel(x)
-		var hit = rand.N(len(reel))
+		var hit = util.RandMT(len(reel)) //rand.N(len(reel))
 		s.SetCol(x, reel, hit)
 	}
 }
@@ -395,13 +395,13 @@ func (s *Screen5x3) ReelSpin(reels Reels) {
 func (s *Screen5x3) SpinBig(r1, rb, r5 []Sym) {
 	var hit int
 	// set 1 reel
-	hit = rand.N(len(r1))
+	hit = util.RandMT(len(r1)) //rand.N(len(r1))
 	s.SetCol(1, r1, hit)
 	// set center
-	var big = rb[rand.N(len(rb))]
+	var big = rb[util.RandMT(len(rb))]
 	s.SetBig(big)
 	// set 5 reel
-	hit = rand.N(len(r5))
+	hit = util.RandMT(len(r5))
 	s.SetCol(5, r5, hit)
 }
 
@@ -474,7 +474,7 @@ func (s *Screen5x4) ReelSpin(reels Reels) {
 	var x Pos
 	for x = 1; x <= 5; x++ {
 		var reel = reels.Reel(x)
-		var hit = rand.N(len(reel))
+		var hit = util.RandMT(len(reel))
 		s.SetCol(x, reel, hit)
 	}
 }
@@ -550,7 +550,7 @@ func (s *Screen6x3) ReelSpin(reels Reels) {
 	var x Pos
 	for x = 1; x <= 6; x++ {
 		var reel = reels.Reel(x)
-		var hit = rand.N(len(reel))
+		var hit = util.RandMT(len(reel))
 		s.SetCol(x, reel, hit)
 	}
 }
@@ -624,7 +624,7 @@ func (s *Screen6x4) ReelSpin(reels Reels) {
 	var x Pos
 	for x = 1; x <= 6; x++ {
 		var reel = reels.Reel(x)
-		var hit = rand.N(len(reel))
+		var hit = util.RandMT(len(reel))
 		s.SetCol(x, reel, hit)
 	}
 }
