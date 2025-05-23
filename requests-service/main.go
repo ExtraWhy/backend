@@ -14,6 +14,8 @@ import (
 )
 
 var (
+	version string = "local" // automatically populated by the build system
+
 	zl = logger.ZapperLog{}
 	do sync.Once
 )
@@ -22,6 +24,8 @@ func log(level int, m string, zpf ...zap.Field) {
 	do.Do(func() {
 		zl.Init(logger.DEV)
 	})
+
+	zpf = append(zpf, zap.String("version", version))
 	zl.Log(level, m, zpf...)
 }
 
@@ -59,8 +63,5 @@ func main() {
 			log(logger.CRITICAL, "Failed run websocket service", zap.Any("what", err))
 			os.Exit(-1)
 		}
-
 	}()
-
-	select {}
 }

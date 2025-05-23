@@ -17,6 +17,8 @@ import (
 )
 
 var (
+	version string = "local" // automatically populated by the build system
+
 	port = flag.Int("port", 50051, "The server port")
 	zl   = logger.ZapperLog{}
 	do   sync.Once
@@ -26,6 +28,8 @@ func log(level int, m string, zpf ...zap.Field) {
 	do.Do(func() {
 		zl.Init(1)
 	})
+
+	zpf = append(zpf, zap.String("version", version))
 	zl.Log(level, m, zpf...)
 }
 

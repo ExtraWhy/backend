@@ -29,12 +29,10 @@ type Server struct {
 }
 
 func (srv *Server) DoRun(conf *config.RequestService) error {
-
 	if conf.DatabaseType == "mongo" {
 		srv.dbiface = &db.NoSqlConnection{}
 		srv.dbiface.Init("Cluster0", "cryptowincryptowin:EfK0weUUe7t99Djx")
 		srv.router = gin.Default()
-
 	} else {
 		srv.dbiface = &db.DBSqlConnection{}
 		srv.dbiface.Init("sqlite3", "players.db")
@@ -42,6 +40,7 @@ func (srv *Server) DoRun(conf *config.RequestService) error {
 		defer srv.dbiface.Deinit()
 		srv.dbiface.(*db.DBSqlConnection).CreatePlayersTable()
 	}
+
 	srv.router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"}, // or fe 3000
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
@@ -50,6 +49,7 @@ func (srv *Server) DoRun(conf *config.RequestService) error {
 		AllowCredentials: false,
 		MaxAge:           12 * time.Hour,
 	}))
+
 	//this fails to resolve cors so will leave it in case the above fix does not work with FE
 	//	srv.router.Use(cors.New(cors.Config{
 	//		AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend

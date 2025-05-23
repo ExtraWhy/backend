@@ -58,12 +58,10 @@ var upgrader = websocket.Upgrader{
 }
 
 func (srv *WSServer) DoRun(conf *config.RequestService) error {
-
 	if conf.DatabaseType == "mongo" {
 		srv.dbiface = &db.NoSqlConnection{}
 		srv.dbiface.Init("Cluster0", "cryptowincryptowin:EfK0weUUe7t99Djx")
 		srv.router = gin.Default()
-
 	} else {
 		srv.dbiface = &db.DBSqlConnection{}
 		srv.dbiface.Init("sqlite3", "players.db")

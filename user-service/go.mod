@@ -5,6 +5,7 @@ go 1.24.1
 require (
 	github.com/ExtraWhy/internal-libs v1.1.0
 	github.com/gin-gonic/gin v1.10.0
+	go.uber.org/zap v1.27.0
 	golang.org/x/oauth2 v0.28.0
 )
 
@@ -41,6 +42,7 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	go.mongodb.org/mongo-driver v1.17.3 // indirect
 	go.mongodb.org/mongo-driver/v2 v2.2.0 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.12.0 // indirect
 	golang.org/x/crypto v0.36.0 // indirect
 	golang.org/x/net v0.38.0 // indirect
