@@ -30,7 +30,6 @@ func log(level int, m string, zpf ...zap.Field) {
 }
 
 func main() {
-
 	if len(os.Args) != 2 {
 		log(logger.CRITICAL, "Error usage: provide config file")
 		//	os.Exit(-1)
@@ -45,7 +44,12 @@ func main() {
 		os.Exit(-2)
 	}
 
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+
 	go func() {
+		defer wg.Done()
+
 		var srvIface servinterface.ServiceInterface
 		log(logger.INFO, "--- rest service up ---")
 		srvIface = &server.Server{}
@@ -56,12 +60,17 @@ func main() {
 	}()
 
 	go func() {
-		var srvIface servinterface.ServiceInterface
+		defer wg.Done()
+
 		log(logger.INFO, "--- websocket service up ---")
-		srvIface = &websocket.WSServer{}
-		if err := srvIface.DoRun(&srvconf); err != nil {
+
+		srv := websocket.NewServer("game-service:50051")
+
+		if err := srv.DoRun(&srvconf); err != nil {
 			log(logger.CRITICAL, "Failed run websocket service", zap.Any("what", err))
 			os.Exit(-1)
 		}
 	}()
+
+	wg.Wait()
 }

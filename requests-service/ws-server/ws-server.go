@@ -16,7 +16,6 @@ import (
 )
 
 type WSServer struct {
-	Host    string
 	Port    uint16
 	router  *gin.Engine
 	dbiface db.DbIface
@@ -55,6 +54,13 @@ var upgrader = websocket.Upgrader{
 		// Allow all connections
 		return true
 	},
+}
+
+func NewServer(addr string) WSServer {
+	return WSServer{
+		Port:   8080,
+		winReq: server.New(addr),
+	}
 }
 
 func (srv *WSServer) DoRun(conf *config.RequestService) error {

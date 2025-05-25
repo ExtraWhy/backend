@@ -30,7 +30,7 @@ func log(level int, m string, zpf ...zap.Field) {
 }
 
 func main() {
-	log(logger.INFO, "Starting user-service", zap.String("version", version))
+	log(logger.INFO, "Starting user-service")
 
 	yaml_config_path := "user-service.yaml"
 

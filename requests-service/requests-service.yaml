@@ -1,8 +1,8 @@
 
 database_url: postgres://postgres:@localhost:5432/database_dev
 database_type: mongo
-rest_service_host: localhost
+rest_service_host: 0.0.0.0
 rest_service_port: 8082
-ws_service_host: localhost
+ws_service_host: 0.0.0.0
 ws_service_port: 8081
 game_serv_port: 50051

@@ -1,35 +1,59 @@
-version: '3.8'
+networks:
+  backend:
+    driver: bridge # Use a bridge network for inter-service communication
 
 services:
   user-service:
     build:
       context: ./user-service
       dockerfile: Dockerfile
+    networks:
+      - backend
     ports:
       - "8080:8080" # REST API service port
     environment:
       - USER_SERVICE_ENV=production # Example environment variable
-    depends_on:
-      - game-service
-      - request-service
+    deploy:
+      resources:
+        limits:
+          memory: 100m # Limit memory usage for the service
+        reservations:
+          memory: 50m # Reserve memory for the service
 
   request-service:
     build:
       context: ./requests-service
       dockerfile: Dockerfile
+    networks:
+      - backend
     ports:
-      - "8081:8081" # gRPC service port
+      - "8081:8081" # REST API service port
       - "8082:8082" # WebSocket service port
     environment:
       - REQUEST_SERVICE_ENV=production # Example environment variable
     depends_on:
       - game-service
+      - user-service
+    deploy:
+      resources:
+        limits:
+          memory: 100m # Limit memory usage for the service
+        reservations:
+          memory: 50m # Reserve memory for the service
 
   game-service:
     build:
       context: ./game-service
       dockerfile: Dockerfile
+    networks:
+      - backend
     ports:
       - "50051:50051" # Map the container's port to the host
     environment:
       - GAME_SERVICE_ENV=production # Example environment variable
+    deploy:
+      resources:
+        limits:
+          memory: 100m # Limit memory usage for the service
+        reservations:
+          memory: 50m # Reserve memory for the service
