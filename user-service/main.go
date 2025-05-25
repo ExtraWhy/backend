@@ -3,13 +3,34 @@ package main
 import (
 	"fmt"
 	"os"
+	"sync"
 	"user-service/handlers"
 
 	"github.com/ExtraWhy/internal-libs/config"
 	"github.com/ExtraWhy/internal-libs/db"
+
+	"github.com/ExtraWhy/internal-libs/logger"
+	"go.uber.org/zap"
 )
 
+var (
+	version string = "local" // automatically populated by the build system
+
+	zl = logger.ZapperLog{}
+	do sync.Once
+)
+
+func log(level int, m string, zpf ...zap.Field) {
+	do.Do(func() {
+		zl.Init(1)
+	})
+
+	zpf = append(zpf, zap.String("version", version))
+	zl.Log(level, m, zpf...)
+}
+
 func main() {
+	log(logger.INFO, "Starting user-service")
 
 	yaml_config_path := "user-service.yaml"
 

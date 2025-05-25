@@ -1,12 +1,20 @@
 # Backend 
 
 ### Build & Run
-1. Run `make.sh` (see Makefile extras below)
-2. Go to `bin`
-3. Start login service : `./user-service user-service.yaml`
-4. Start request service: `./request-service request-service.yaml`
-5. Start game service: `./game-service` 
-~~5. [test] run `./gen-players.sh` to insert 10 dummy players~~ (still possible but not recommended avoid it, use the mongo)
+There are two ways to build and run the services:
+1. You can build and run them using `docker` and `docker compose` - this method will set everything up without the need to manually build the services and orcestrate them to run. To build and run the services this way, you need to know the following commands:
+    1. Run `docker compose up --build -d` in the project's root folder. The last `-d` flad tells docker to run them in detached mode, which means you can use the same console to test the services, too.
+    2. If running the services this way doesn't seem to work, then you can see what the logs for the different services are by running.
+     `docker logs -f <container_id or container_name>`.
+     You can get the names of the running containers using
+     `docker ps`   (if you'd like to see all containers, including the stopped ones, then run `docker ps -a` alternatively).
+1. Using the make script
+    1. Run `make.sh` (see Makefile extras below)
+    2. Go to `bin`
+    3. Start login service : `./user-service user-service.yaml`
+    4. Start request service: `./request-service request-service.yaml`
+    5. Start game service: `./game-service` 
+    ~~5. [test] run `./gen-players.sh` to insert 10 dummy players~~ (still possible but not recommended avoid it, use the mongo)
 
 
 ### Todo:

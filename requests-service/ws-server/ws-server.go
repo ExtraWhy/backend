@@ -16,7 +16,6 @@ import (
 )
 
 type WSServer struct {
-	Host    string
 	Port    uint16
 	router  *gin.Engine
 	dbiface db.DbIface
@@ -57,13 +56,18 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func (srv *WSServer) DoRun(conf *config.RequestService) error {
+func NewServer(addr string) WSServer {
+	return WSServer{
+		Port:   8080,
+		winReq: server.New(addr),
+	}
+}
 
+func (srv *WSServer) DoRun(conf *config.RequestService) error {
 	if conf.DatabaseType == "mongo" {
 		srv.dbiface = &db.NoSqlConnection{}
 		srv.dbiface.Init("Cluster0", "cryptowincryptowin:EfK0weUUe7t99Djx")
 		srv.router = gin.Default()
-
 	} else {
 		srv.dbiface = &db.DBSqlConnection{}
 		srv.dbiface.Init("sqlite3", "players.db")
