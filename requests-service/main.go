@@ -37,8 +37,8 @@ func main() {
 
 	var conf = config.MegaConfig{}
 	srvconf := config.RequestService{}
-	//if err := conf.LoadConfig("requests-service.yaml", &srvconf); err != nil {
-	if err := conf.LoadConfig(os.Args[1], &srvconf); err != nil {
+	if err := conf.LoadConfig("requests-service.yaml", &srvconf); err != nil {
+		//if err := conf.LoadConfig(os.Args[1], &srvconf); err != nil {
 		log(logger.CRITICAL, "Failed to load config file", zap.Any("what", err))
 		fmt.Println("Failed to load cofig file")
 		os.Exit(-2)

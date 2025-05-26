@@ -6,3 +6,4 @@ rest_service_port: 8082
 ws_service_host: 0.0.0.0
 ws_service_port: 8081
 game_serv_port: 50051
+test_mode: on

@@ -14,7 +14,7 @@ There are two ways to build and run the services:
     2. Go to `bin`
     3. Start login service : `./user-service user-service.yaml`
     4. Start request service: `./request-service request-service.yaml`
-    5. Start game service: `./game-service` 
+    ~~5. Start game service: `./game-service`~~ 
     ~~5. [test] run `./gen-players.sh` to insert 10 dummy players~~ (still possible but not recommended avoid it, use the mongo)
 
 
@@ -39,7 +39,7 @@ There are two ways to build and run the services:
 3. modify `requests-service.yaml` to use `sqlite3` instead of `mongo` if you are offline, otherwise leave unchanged.
 4. run `./request-service request-service.yaml`
 5. In case you use `sqlite3` option , run `./gen-players.sh` to populate the local db with dummy players. 
-6. run `./game-service`  or `./game-service t` (t opiton os for the permuted reels test), no option is for random reels (original)
+6. ~~run `./game-service`  or `./game-service t` (t opiton os for the permuted reels test), no option is for random reels (original)~~
 7. open in the browser `pay-histogram.html` and press `F12` for firefox to see the console log 
 8. You may watch the histogram in the canvas and track the rtp percentage in the console log.
 

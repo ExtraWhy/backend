@@ -52,7 +52,18 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+func testMode(s *string) bool {
+	if s != nil && (*s == "on" || *s == "On" || *s == "Enabled" ||
+		*s == "enabled" || *s == "True" || *s == "true") {
+		return true
+	} else {
+		return false
+	}
+}
+
 func (srv *WSServer) DoRun(conf *config.RequestService) error {
+
+	crwcleopatra.TestMode = testMode(&conf.TestMode)
 
 	if conf.DatabaseType == "mongo" {
 		srv.dbiface = &db.NoSqlConnection{}
