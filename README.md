@@ -8,6 +8,7 @@ There are two ways to build and run the services:
      `docker logs -f <container_id or container_name>`.
      You can get the names of the running containers using
      `docker ps`   (if you'd like to see all containers, including the stopped ones, then run `docker ps -a` alternatively).
+    3. If you encounter problems that a specific image is taken or being used, just run `docker system prune -a --volumes` to clean docker and follow step `1.`
 1. Using the make script
     1. Run `make.sh` (see Makefile extras below)
     2. Go to `bin`
