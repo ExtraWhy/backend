@@ -1,10 +1,11 @@
-package cleopatra
+package crwcleopatra
 
 // See: https://www.slotsmate.com/software/igt/igt-cleopatra
 
 import (
 	_ "embed"
-	slot "proto/player/server/slots"
+
+	"casino/slots"
 )
 
 var TestMode bool = false
@@ -12,7 +13,7 @@ var TestMode bool = false
 //go:embed cleopatra_reel.yaml
 var reels []byte
 
-var ReelsMap = slot.ReadMap[*slot.Reels5x](reels)
+var ReelsMap = slots.ReadMap[*slots.Reels5x](reels)
 
 // Lined payment.
 var LinePay = [13][5]float64{
@@ -38,47 +39,47 @@ var ScatPay = [5]float64{0, 2, 5, 20, 100} // 13 sphinx
 var ScatFreespin = [5]int{0, 0, 15, 15, 15} // 13 sphinx
 
 // Bet lines
-var BetLines = slot.BetLinesIgt5x3[:20]
+var BetLines = slots.BetLinesIgt5x3[:20]
 
 type Game struct {
-	slot.Screen5x3 `yaml:",inline"`
-	slot.Slotx     `yaml:",inline"`
+	slots.Screen5x3 `yaml:",inline"`
+	slots.Slotx     `yaml:",inline"`
 }
 
 // Declare conformity with SlotGame interface.
-var _ slot.SlotGame = (*Game)(nil)
+var _ slots.SlotGame = (*Game)(nil)
 
 func NewGame() *Game {
 	return &Game{
-		Slotx: slot.Slotx{
+		Slotx: slots.Slotx{
 			Sel: len(BetLines),
 			Bet: 1,
 		},
 	}
 }
 
-func (g *Game) Clone() slot.SlotGame {
+func (g *Game) Clone() slots.SlotGame {
 	var clone = *g
 	return &clone
 }
 
 const wild, scat = 1, 13
 
-func (g *Game) Scanner(wins *slot.Wins) error {
+func (g *Game) Scanner(wins *slots.Wins) error {
 	g.ScanLined(wins)
 	g.ScanScatters(wins)
 	return nil
 }
 
 // Lined symbols calculation.
-func (g *Game) ScanLined(wins *slot.Wins) {
+func (g *Game) ScanLined(wins *slots.Wins) {
 	for li := 1; li <= g.Sel; li++ {
 		var line = BetLines[li-1]
 
 		var mw float64 = 1 // mult wild
-		var numw, numl slot.Pos = 0, 5
-		var syml slot.Sym
-		var x slot.Pos
+		var numw, numl slots.Pos = 0, 5
+		var syml slots.Sym
+		var x slots.Pos
 		for x = 1; x <= 5; x++ {
 			var sx = g.LY(x, line)
 			if sx == wild {
@@ -106,7 +107,7 @@ func (g *Game) ScanLined(wins *slot.Wins) {
 			if g.FSR > 0 {
 				mm = 3
 			}
-			*wins = append(*wins, slot.WinItem{
+			*wins = append(*wins, slots.WinItem{
 				Pay:  g.Bet * payl,
 				Mult: mw * mm,
 				Sym:  syml,
@@ -119,7 +120,7 @@ func (g *Game) ScanLined(wins *slot.Wins) {
 			if g.FSR > 0 && numw < 5 {
 				mm = 3
 			}
-			*wins = append(*wins, slot.WinItem{
+			*wins = append(*wins, slots.WinItem{
 				Pay:  g.Bet * payw,
 				Mult: mm,
 				Sym:  wild,
@@ -132,14 +133,14 @@ func (g *Game) ScanLined(wins *slot.Wins) {
 }
 
 // Scatters calculation.
-func (g *Game) ScanScatters(wins *slot.Wins) {
+func (g *Game) ScanScatters(wins *slots.Wins) {
 	if count := g.ScatNum(scat); count >= 2 {
 		var mm float64 = 1 // mult mode
 		if g.FSR > 0 {
 			mm = 3
 		}
 		var pay, fs = ScatPay[count-1], ScatFreespin[count-1]
-		*wins = append(*wins, slot.WinItem{
+		*wins = append(*wins, slots.WinItem{
 			Pay:  g.Bet * float64(g.Sel) * pay,
 			Mult: mm,
 			Sym:  scat,
@@ -151,7 +152,7 @@ func (g *Game) ScanScatters(wins *slot.Wins) {
 }
 
 func (g *Game) Spin(mrtp float64) {
-	var reels, _ = slot.FindClosest(ReelsMap, mrtp)
+	var reels, _ = slots.FindClosest(ReelsMap, mrtp)
 	if !TestMode {
 		g.ReelSpin(reels)
 	} else {
