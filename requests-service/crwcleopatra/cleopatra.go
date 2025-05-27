@@ -105,6 +105,7 @@ func GetWinForCleopatra(msg *models.MessageBet) (*models.CleopatraWins, error) {
 		}
 
 	}
+	wins.Reset() //reset the wins
 	return &retwins, nil
 }
 
