@@ -21,7 +21,9 @@ There are two ways to build and run the services:
 ### Todo:
 1. ~~Learn uber's zap logger and use it accordingly in the project~~
 2. ~~Replace all printlines with `logger.ZapperLog` and use it for everything~~
-
+3. Recovery implementation
+4. History implementation
+5. Free games
 
 ### Protobuf server-client [deprecated soon]
 ~~1. Those are just a template usages of grpc~~
