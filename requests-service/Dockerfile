@@ -2,17 +2,18 @@ FROM golang:1.24 AS builder
 
 WORKDIR /app
 
-ADD models/ models
-ADD player-cache/ player-cache
-ADD proto-client/ proto-client
+ADD game/models/ game/models
+ADD game/player-cache/ game/player-cache
+ADD game/crwcleopatra game/crwcleopatra
+ADD game/bitvector game/bitvector
+ADD game/slots game/slots
+ADD game/util game/util 
 ADD rest-server/ rest-server
 ADD serv-interface/ serv-interface
 ADD ws-server/ ws-server
 
 COPY go.mod go.sum requests-service.yaml main.go ./
-
 RUN go mod download
-
 RUN CGO_ENABLED=0 go build -o request-service -ldflags="-X 'main.version=0.0.1'" -tags netgo -a -v main.go
 
 FROM alpine:latest

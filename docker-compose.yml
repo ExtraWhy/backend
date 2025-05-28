@@ -32,7 +32,6 @@ services:
     environment:
       - REQUEST_SERVICE_ENV=production # Example environment variable
     depends_on:
-      - game-service
       - user-service
     deploy:
       resources:
