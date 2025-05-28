@@ -1,10 +1,10 @@
 package wsserver
 
 import (
-	"casino/crwcleopatra"
-	"casino/models"
-	feresponse "casino/models"
-	playercache "casino/player-cache"
+	"casino/game/crwcleopatra"
+	"casino/game/models"
+	feresponse "casino/game/models"
+	playercache "casino/game/player-cache"
 	"fmt"
 	"net/http"
 	"strconv"

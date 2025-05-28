@@ -1,7 +1,7 @@
 package slots
 
 import (
-	"casino/util"
+	"casino/game/util"
 	"encoding/json"
 	"sync"
 

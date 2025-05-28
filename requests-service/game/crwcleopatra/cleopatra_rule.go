@@ -5,7 +5,7 @@ package crwcleopatra
 import (
 	_ "embed"
 
-	"casino/slots"
+	"casino/game/slots"
 )
 
 var TestMode bool = false

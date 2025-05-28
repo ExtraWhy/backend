@@ -1,7 +1,7 @@
 package server
 
 import (
-	playercache "casino/player-cache"
+	playercache "casino/game/player-cache"
 	"fmt"
 	"net/http"
 	"strconv"

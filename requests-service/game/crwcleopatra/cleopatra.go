@@ -1,9 +1,9 @@
 package crwcleopatra
 
 import (
-	"casino/bitvector"
-	models "casino/models"
-	"casino/slots"
+	"casino/game/bitvector"
+	models "casino/game/models"
+	"casino/game/slots"
 	"errors"
 	"fmt"
 	"sync"
