@@ -8,19 +8,22 @@ There are two ways to build and run the services:
      `docker logs -f <container_id or container_name>`.
      You can get the names of the running containers using
      `docker ps`   (if you'd like to see all containers, including the stopped ones, then run `docker ps -a` alternatively).
+    3. If you encounter problems that a specific image is taken or being used, just run `docker system prune -a --volumes` to clean docker and follow step `1.`
 1. Using the make script
     1. Run `make.sh` (see Makefile extras below)
     2. Go to `bin`
     3. Start login service : `./user-service user-service.yaml`
     4. Start request service: `./request-service request-service.yaml`
-    5. Start game service: `./game-service` 
+    ~~5. Start game service: `./game-service`~~ 
     ~~5. [test] run `./gen-players.sh` to insert 10 dummy players~~ (still possible but not recommended avoid it, use the mongo)
 
 
 ### Todo:
 1. ~~Learn uber's zap logger and use it accordingly in the project~~
 2. ~~Replace all printlines with `logger.ZapperLog` and use it for everything~~
-
+3. Recovery implementation
+4. History implementation
+5. Free games
 
 ### Protobuf server-client [deprecated soon]
 ~~1. Those are just a template usages of grpc~~
@@ -38,7 +41,7 @@ There are two ways to build and run the services:
 3. modify `requests-service.yaml` to use `sqlite3` instead of `mongo` if you are offline, otherwise leave unchanged.
 4. run `./request-service request-service.yaml`
 5. In case you use `sqlite3` option , run `./gen-players.sh` to populate the local db with dummy players. 
-6. run `./game-service`  or `./game-service t` (t opiton os for the permuted reels test), no option is for random reels (original)
+6. ~~run `./game-service`  or `./game-service t` (t opiton os for the permuted reels test), no option is for random reels (original)~~
 7. open in the browser `pay-histogram.html` and press `F12` for firefox to see the console log 
 8. You may watch the histogram in the canvas and track the rtp percentage in the console log.
 

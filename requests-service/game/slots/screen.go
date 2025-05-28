@@ -1,8 +1,8 @@
 package slots
 
 import (
+	"casino/game/util"
 	"encoding/json"
-	"proto/player/server/util"
 	"sync"
 
 	"github.com/ExtraWhy/internal-libs/logger"

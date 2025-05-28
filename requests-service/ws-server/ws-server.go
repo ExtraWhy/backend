@@ -1,9 +1,10 @@
-package websocket
+package wsserver
 
 import (
-	feresponse "casino/rest-backend/models"
-	playercache "casino/rest-backend/player-cache"
-	server "casino/rest-backend/proto-client"
+	"casino/game/crwcleopatra"
+	"casino/game/models"
+	feresponse "casino/game/models"
+	playercache "casino/game/player-cache"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -16,10 +17,10 @@ import (
 )
 
 type WSServer struct {
+	Host    string
 	Port    uint16
 	router  *gin.Engine
 	dbiface db.DbIface
-	winReq  server.WinRequest
 }
 
 const (
@@ -41,13 +42,8 @@ type skv struct {
 	v cachedPlayer
 }
 
-type MessageBet struct {
-	Id    uint64 `json:"id"`
-	Money uint64 `json:"money"`
-}
-
 var clients = make(map[*websocket.Conn]*player.Player)
-var broadcast = make(chan MessageBet)
+var broadcast = make(chan models.MessageBet)
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -56,18 +52,24 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func NewServer(addr string) WSServer {
-	return WSServer{
-		Port:   8080,
-		winReq: server.New(addr),
+func testMode(s *string) bool {
+	if s != nil && (*s == "on" || *s == "On" || *s == "Enabled" ||
+		*s == "enabled" || *s == "True" || *s == "true") {
+		return true
+	} else {
+		return false
 	}
 }
 
 func (srv *WSServer) DoRun(conf *config.RequestService) error {
+
+	crwcleopatra.TestMode = testMode(&conf.TestMode)
+
 	if conf.DatabaseType == "mongo" {
 		srv.dbiface = &db.NoSqlConnection{}
 		srv.dbiface.Init("Cluster0", "cryptowincryptowin:EfK0weUUe7t99Djx")
 		srv.router = gin.Default()
+
 	} else {
 		srv.dbiface = &db.DBSqlConnection{}
 		srv.dbiface.Init("sqlite3", "players.db")
@@ -98,48 +100,7 @@ func (srv *WSServer) DoRun(conf *config.RequestService) error {
 	return srv.router.Run(hp)
 }
 
-func (srv *WSServer) getPlayerPlay(msg *MessageBet, fe *feresponse.CRW_Fe_resp) uint {
-
-	players := srv.dbiface.DisplayPlayers()
-	fe.Id = msg.Id
-	if len(players) > 0 {
-		for _, i := range players {
-			if i.Id == fe.Id {
-				if i.Money < msg.Money {
-					return CRW_No_money
-				}
-				//do proto call
-				if err := srv.winReq.SendWin(msg.Id); err != nil {
-					return CRW_Unknown
-				} else {
-					fe.Won = srv.winReq.PlayerResponse.GetMoneyWon()
-					if fe.Won > 0 {
-						fe.Name = i.Name
-						i.Money += (fe.Won * msg.Money)
-						tmp2 := srv.winReq.PlayerResponse.GetLines()
-						for i := 0; i < len(tmp2); i++ {
-							fe.Lines = append(fe.Lines, tmp2[i])
-						}
-						playercache.PutToCache(&i)
-					} else {
-						i.Money = i.Money - msg.Money
-					}
-					fe.Reels = srv.winReq.PlayerResponse.GetReels()
-
-					if _, err := srv.dbiface.UpdatePlayerMoney(&i); err != nil {
-						return CRW_Db_err_write
-					}
-					break
-				}
-			}
-		}
-	} else {
-		return CRW_Db_no_players
-	}
-	return CRW_Ok
-}
-
-func (srv *WSServer) getPlayerPlayCleo(msg *MessageBet, fer *feresponse.CRW_Fe_resp_slots) uint {
+func (srv *WSServer) getPlayerPlayCleo(msg *models.MessageBet, fer *feresponse.CRW_Fe_resp_slots) uint {
 
 	var player *player.Player
 	players := srv.dbiface.DisplayPlayers()
@@ -156,54 +117,45 @@ func (srv *WSServer) getPlayerPlayCleo(msg *MessageBet, fer *feresponse.CRW_Fe_r
 	if player == nil {
 		return CRW_Db_no_player_with_id
 	}
-
-	if err := srv.winReq.SendWin4Cleo(msg.Id, msg.Money); err != nil {
+	if resp, err := crwcleopatra.GetWinForCleopatra(msg); err != nil {
 		return CRW_Unknown
 	} else {
 		var j = 0
 		for x := 0; x < 5; x++ {
 			for y := 0; y < 3; y++ {
-				fer.Scr[x][y] = srv.winReq.CleopatraResponse.Syms[x*3+y]
+				fer.Scr[x][y] = resp.Syms[x*3+y]
 			}
 		}
 
 		//todo sym the win response and decide the player to display in the most recent played
-		if len(srv.winReq.CleopatraResponse.Wins) > 0 {
+		if len(resp.Wins) > 0 {
 			playercache.PutToCache(player)
 		}
-		fer.Cleo = make([]feresponse.CRW_Fe_resp_cleo, len(srv.winReq.CleopatraResponse.Wins))
-		for i := range srv.winReq.CleopatraResponse.Wins {
+		fer.Cleo = make([]feresponse.CRW_Fe_resp_cleo, len(resp.Wins))
+		for i := range resp.Wins {
+
 			fer.Cleo[j].XY = make([]uint32, 1)
-			if srv.winReq.CleopatraResponse.Wins[i].BID != nil {
-				fer.Cleo[j].BID = *srv.winReq.CleopatraResponse.Wins[i].BID
-			}
-			if srv.winReq.CleopatraResponse.Wins[i].Free != nil {
-				fer.Cleo[j].Free = *srv.winReq.CleopatraResponse.Wins[i].Free
-			}
-			if srv.winReq.CleopatraResponse.Wins[i].JID != nil {
-				fer.Cleo[j].JID = *srv.winReq.CleopatraResponse.Wins[i].JID
-			}
-			if srv.winReq.CleopatraResponse.Wins[i].Jack != nil {
-				fer.Cleo[j].Jack = *srv.winReq.CleopatraResponse.Wins[i].Jack
-			}
-			if srv.winReq.CleopatraResponse.Wins[i].Line != nil {
-				fer.Cleo[j].Line = *srv.winReq.CleopatraResponse.Wins[i].Line
-			}
-			if srv.winReq.CleopatraResponse.Wins[i].Mult != nil {
-				fer.Cleo[j].Mult = *srv.winReq.CleopatraResponse.Wins[i].Mult
-			}
-			if srv.winReq.CleopatraResponse.Wins[i].Pay != nil {
-				fer.Cleo[j].Pay = *srv.winReq.CleopatraResponse.Wins[i].Pay
-			}
-			if srv.winReq.CleopatraResponse.Wins[i].Sym != nil {
-				fer.Cleo[j].Sym = *srv.winReq.CleopatraResponse.Wins[i].Sym
-			}
-			if srv.winReq.CleopatraResponse.Wins[i].Num != nil {
-				fer.Cleo[j].Num = *srv.winReq.CleopatraResponse.Wins[i].Num
-			}
-			if srv.winReq.CleopatraResponse.Wins[i].Linex != nil {
-				for k := 0; k < len(*&srv.winReq.CleopatraResponse.Wins[i].Linex); k++ {
-					fer.Cleo[j].XY = append(fer.Cleo[j].XY, *&srv.winReq.CleopatraResponse.Wins[i].Linex[k])
+			fer.Cleo[j].BID = resp.Wins[i].BID
+
+			fer.Cleo[j].Free = resp.Wins[i].Free
+
+			fer.Cleo[j].JID = resp.Wins[i].JID
+
+			fer.Cleo[j].Jack = resp.Wins[i].Jack
+
+			fer.Cleo[j].Line = resp.Wins[i].Line
+
+			fer.Cleo[j].Mult = resp.Wins[i].Mult
+
+			fer.Cleo[j].Pay = resp.Wins[i].Pay
+
+			fer.Cleo[j].Sym = resp.Wins[i].Sym
+
+			fer.Cleo[j].Num = resp.Wins[i].Num
+
+			if resp.Wins[i].Linex != nil {
+				for k := 0; k < len(*&resp.Wins[i].Linex); k++ {
+					fer.Cleo[j].XY = append(fer.Cleo[j].XY, *&resp.Wins[i].Linex[k])
 				}
 			}
 			j++
@@ -298,7 +250,7 @@ func (ws *WSServer) handleBroadcast() {
 
 func handleWebSocketConnection(conn *websocket.Conn) {
 	for {
-		var message MessageBet
+		var message models.MessageBet
 		err := conn.ReadJSON(&message)
 		if err != nil {
 			conn.Close()

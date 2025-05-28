@@ -1,4 +1,4 @@
-package feresponse
+package models
 
 type CRW_Fe_resp struct {
 	Id    uint64  `json:"id"`

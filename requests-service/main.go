@@ -1,9 +1,9 @@
 package main
 
 import (
-	server "casino/rest-backend/rest-server"
-	servinterface "casino/rest-backend/serv-interface"
-	websocket "casino/rest-backend/ws-server"
+	server "casino/rest-server"
+	servinterface "casino/serv-interface"
+	websocket "casino/ws-server"
 	"fmt"
 	"os"
 	"sync"
@@ -61,12 +61,13 @@ func main() {
 
 	go func() {
 		defer wg.Done()
+		var srvIface servinterface.ServiceInterface
 
 		log(logger.INFO, "--- websocket service up ---")
 
-		srv := websocket.NewServer("game-service:50051")
+		srvIface = &websocket.WSServer{}
 
-		if err := srv.DoRun(&srvconf); err != nil {
+		if err := srvIface.DoRun(&srvconf); err != nil {
 			log(logger.CRITICAL, "Failed run websocket service", zap.Any("what", err))
 			os.Exit(-1)
 		}

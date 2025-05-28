@@ -1,8 +1,6 @@
 package slots
 
-import (
-	"proto/player/server/util"
-)
+import "casino/game/util"
 
 type Cascade interface {
 	Screen

@@ -14,7 +14,6 @@ fi
 
 login_service_name="user-service"
 request_service_name="requests-service"
-proto_service="game-service"
 fe_tests="fe-tests"
 
 internal_libs=""
@@ -99,15 +98,6 @@ echo "--------------------------------------------------------------------------
 mkdir $output
 cp  $fe_tests/* $output
 
-echo "Prepare game service "
-cd game-service
-update_go
-
-go build -o $proto_service main.go
-mv $proto_service "../"$output
-cp *.sh "../"$output
-echo "finished"
-cd ..
 
 
 echo "Prepare user service"

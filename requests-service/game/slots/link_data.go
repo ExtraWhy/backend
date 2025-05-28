@@ -1,9 +1,9 @@
 package slots
 
 import (
+	"casino/game/util"
 	"context"
 	"math"
-	"proto/player/server/util"
 	"sort"
 )
 
