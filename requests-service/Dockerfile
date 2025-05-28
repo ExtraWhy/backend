@@ -13,9 +13,7 @@ ADD serv-interface/ serv-interface
 ADD ws-server/ ws-server
 
 COPY go.mod go.sum requests-service.yaml main.go ./
-#RUN go mod tidy 
 RUN go mod download
-#RUN go build -o request-service main.go
 RUN CGO_ENABLED=0 go build -o request-service -ldflags="-X 'main.version=0.0.1'" -tags netgo -a -v main.go
 
 FROM alpine:latest
