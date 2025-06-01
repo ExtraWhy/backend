@@ -46,9 +46,7 @@ func GetWinForCleopatra(msg *models.MessageBet) *models.CleopatraWins {
 	retwins := models.CleopatraWins{}
 	retwins.Wins = make([]models.CleopatraWin, 1)
 	wins, cl := CleopatraSpinV2(msg.Money)
-	if len(*wins) == 0 {
-		return nil
-	}
+
 	for j := 0; j < 5; j++ {
 		for i := 0; i < 3; i++ {
 			retwins.Syms = append(retwins.Syms, int32(cl.Scr[j][i]))

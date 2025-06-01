@@ -118,52 +118,49 @@ func (srv *WSServer) getPlayerPlayCleo(msg *models.MessageBet, fer *feresponse.C
 	if player == nil {
 		return CRW_Db_no_player_with_id
 	}
-	if resp := crwcleopatra.GetWinForCleopatra(msg); resp == nil {
-		return CRW_No_Win
-	} else {
-		var j = 0
-		for x := 0; x < 5; x++ {
-			for y := 0; y < 3; y++ {
-				fer.Scr[x][y] = resp.Syms[x*3+y]
-			}
+	resp := crwcleopatra.GetWinForCleopatra(msg)
+	var j = 0
+	for x := 0; x < 5; x++ {
+		for y := 0; y < 3; y++ {
+			fer.Scr[x][y] = resp.Syms[x*3+y]
 		}
-
-		//todo sym the win response and decide the player to display in the most recent played
-		if len(resp.Wins) > 0 {
-			playercache.PutToCache(player)
-		}
-		fer.Cleo = make([]feresponse.CRW_Fe_resp_cleo, len(resp.Wins))
-		for i := range resp.Wins {
-
-			fer.Cleo[j].XY = make([]uint32, 1)
-			fer.Cleo[j].BID = resp.Wins[i].BID
-
-			fer.Cleo[j].Free = resp.Wins[i].Free
-
-			fer.Cleo[j].JID = resp.Wins[i].JID
-
-			fer.Cleo[j].Jack = resp.Wins[i].Jack
-
-			fer.Cleo[j].Line = resp.Wins[i].Line
-
-			fer.Cleo[j].Mult = resp.Wins[i].Mult
-
-			fer.Cleo[j].Pay = resp.Wins[i].Pay
-
-			fer.Cleo[j].Sym = resp.Wins[i].Sym
-
-			fer.Cleo[j].Num = resp.Wins[i].Num
-
-			if resp.Wins[i].Linex != nil {
-				for k := 0; k < len(*&resp.Wins[i].Linex); k++ {
-					fer.Cleo[j].XY = append(fer.Cleo[j].XY, *&resp.Wins[i].Linex[k])
-				}
-			}
-			j++
-		}
-
-		return CRW_Ok
 	}
+
+	//todo sym the win response and decide the player to display in the most recent played
+	if len(resp.Wins) > 0 {
+		playercache.PutToCache(player)
+	}
+	fer.Cleo = make([]feresponse.CRW_Fe_resp_cleo, len(resp.Wins))
+	for i := range resp.Wins {
+
+		fer.Cleo[j].XY = make([]uint32, 1)
+		fer.Cleo[j].BID = resp.Wins[i].BID
+
+		fer.Cleo[j].Free = resp.Wins[i].Free
+
+		fer.Cleo[j].JID = resp.Wins[i].JID
+
+		fer.Cleo[j].Jack = resp.Wins[i].Jack
+
+		fer.Cleo[j].Line = resp.Wins[i].Line
+
+		fer.Cleo[j].Mult = resp.Wins[i].Mult
+
+		fer.Cleo[j].Pay = resp.Wins[i].Pay
+
+		fer.Cleo[j].Sym = resp.Wins[i].Sym
+
+		fer.Cleo[j].Num = resp.Wins[i].Num
+
+		if resp.Wins[i].Linex != nil {
+			for k := 0; k < len(*&resp.Wins[i].Linex); k++ {
+				fer.Cleo[j].XY = append(fer.Cleo[j].XY, *&resp.Wins[i].Linex[k])
+			}
+		}
+		j++
+
+	}
+	return CRW_Ok
 
 }
 
