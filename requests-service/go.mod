@@ -5,12 +5,11 @@ go 1.24.1
 toolchain go1.24.3
 
 require (
-	github.com/ExtraWhy/internal-libs v1.1.1-0.20250526134006-d57bc215ec1b
+	github.com/ExtraWhy/internal-libs v1.1.1-0.20250531203309-2f8976b54bcf
 	github.com/gin-contrib/cors v1.7.5
 	github.com/gin-gonic/gin v1.10.1
 	github.com/gorilla/websocket v1.5.3
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.71.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -52,5 +51,6 @@ require (
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.25.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
+	google.golang.org/grpc v1.71.1 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 )

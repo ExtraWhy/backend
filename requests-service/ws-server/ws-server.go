@@ -27,9 +27,10 @@ const (
 	CRW_Ok                   = 0
 	CRW_No_money             = 1
 	CRW_Db_err_write         = 2
-	CRW_Db_err_read          = 3
-	CRW_Db_no_players        = 4
-	CRW_Db_no_player_with_id = 5
+	CRW_Db_err_read          = 4
+	CRW_Db_no_players        = 8
+	CRW_Db_no_player_with_id = 16
+	CRW_No_Win               = 32
 	CRW_Unknown              = 0xff
 )
 
@@ -117,8 +118,8 @@ func (srv *WSServer) getPlayerPlayCleo(msg *models.MessageBet, fer *feresponse.C
 	if player == nil {
 		return CRW_Db_no_player_with_id
 	}
-	if resp, err := crwcleopatra.GetWinForCleopatra(msg); err != nil {
-		return CRW_Unknown
+	if resp := crwcleopatra.GetWinForCleopatra(msg); resp == nil {
+		return CRW_No_Win
 	} else {
 		var j = 0
 		for x := 0; x < 5; x++ {
