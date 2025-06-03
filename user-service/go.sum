@@ -1,7 +1,7 @@
 cloud.google.com/go/compute/metadata v0.6.0 h1:A6hENjEsCDtC1k8byVsgwvVcioamEHvZ4j01OwKxG9I=
 cloud.google.com/go/compute/metadata v0.6.0/go.mod h1:FjyFAW1MW0C203CEOMDTu3Dk1FlqW3Rga40jzHL4hfg=
-github.com/ExtraWhy/internal-libs v1.1.1-0.20250531203309-2f8976b54bcf h1:m+xvDGngyp3p8TGdunEf5jZFbFy+b3cDg+3S2C4roRM=
-github.com/ExtraWhy/internal-libs v1.1.1-0.20250531203309-2f8976b54bcf/go.mod h1:3OP8siGaLYwY5L739EDzObLhKSU01odft3xWMMfEnh8=
+github.com/ExtraWhy/internal-libs v1.1.1-0.20250602221556-aec3eb9d5b30 h1:F4zE21ZnSBG4g5/5r9qMxGnaMAywpLIokeVwq26V9+s=
+github.com/ExtraWhy/internal-libs v1.1.1-0.20250602221556-aec3eb9d5b30/go.mod h1:3OP8siGaLYwY5L739EDzObLhKSU01odft3xWMMfEnh8=
 github.com/bytedance/sonic v1.12.6 h1:/isNmCUF2x3Sh8RAp/4mh4ZGkcFAX/hLrzrK3AvpRzk=
 github.com/bytedance/sonic v1.12.6/go.mod h1:B8Gt/XvtZ3Fqj+iSKMypzymZxw/FVwgIGKzMzT9r/rk=
 github.com/bytedance/sonic/loader v0.1.1/go.mod h1:ncP89zfokxS5LZrJxl5z0UJcsk4M4yY2JpfqGeCtNLU=

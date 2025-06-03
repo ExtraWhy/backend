@@ -3,7 +3,7 @@ module user-service
 go 1.24.1
 
 require (
-	github.com/ExtraWhy/internal-libs v1.1.1-0.20250531203309-2f8976b54bcf
+	github.com/ExtraWhy/internal-libs v1.1.1-0.20250602221556-aec3eb9d5b30
 	github.com/gin-gonic/gin v1.10.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/oauth2 v0.28.0

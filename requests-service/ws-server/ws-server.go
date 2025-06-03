@@ -5,6 +5,7 @@ import (
 	"casino/game/models"
 	feresponse "casino/game/models"
 	playercache "casino/game/player-cache"
+	"casino/recovery"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -12,6 +13,7 @@ import (
 	"github.com/ExtraWhy/internal-libs/config"
 	"github.com/ExtraWhy/internal-libs/db"
 	"github.com/ExtraWhy/internal-libs/models/player"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -79,12 +81,6 @@ func (srv *WSServer) DoRun(conf *config.RequestService) error {
 		srv.dbiface.(*db.DBSqlConnection).CreatePlayersTable()
 	}
 
-	//srv.router.Use(cors.New(cors.Config{
-	//	AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend
-	//	AllowMethods: []string{"GET", "POST", "OPTIONS"},
-	//	AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
-	//}))
-
 	srv.router.GET("/ws", func(c *gin.Context) {
 		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
@@ -131,13 +127,14 @@ func (srv *WSServer) getPlayerPlayCleo(msg *models.MessageBet, fer *feresponse.C
 		playercache.PutToCache(player)
 	}
 	fer.Cleo = make([]feresponse.CRW_Fe_resp_cleo, len(resp.Wins))
+	var freegames uint64 = 0
 	for i := range resp.Wins {
 
 		fer.Cleo[j].XY = make([]uint32, 1)
 		fer.Cleo[j].BID = resp.Wins[i].BID
 
 		fer.Cleo[j].Free = resp.Wins[i].Free
-
+		freegames += uint64(resp.Wins[i].Free)
 		fer.Cleo[j].JID = resp.Wins[i].JID
 
 		fer.Cleo[j].Jack = resp.Wins[i].Jack
@@ -158,8 +155,8 @@ func (srv *WSServer) getPlayerPlayCleo(msg *models.MessageBet, fer *feresponse.C
 			}
 		}
 		j++
-
 	}
+	recovery.AddRecord(player) //store player test
 	return CRW_Ok
 
 }
@@ -183,7 +180,6 @@ func (srv *WSServer) getWinners(ctx *gin.Context) {
 		return
 	}
 	ctx.IndentedJSON(http.StatusNoContent, gin.H{"message": "No 5 winners present"})
-
 }
 
 func (srv *WSServer) getPlayerById(ctx *gin.Context) {

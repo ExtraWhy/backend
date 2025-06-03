@@ -5,7 +5,7 @@ go 1.24.1
 toolchain go1.24.3
 
 require (
-	github.com/ExtraWhy/internal-libs v1.1.1-0.20250531203309-2f8976b54bcf
+	github.com/ExtraWhy/internal-libs v1.1.1-0.20250602221556-aec3eb9d5b30
 	github.com/gin-contrib/cors v1.7.5
 	github.com/gin-gonic/gin v1.10.1
 	github.com/gorilla/websocket v1.5.3
