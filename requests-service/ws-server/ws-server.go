@@ -156,7 +156,7 @@ func (srv *WSServer) getPlayerPlayCleo(msg *models.MessageBet, fer *feresponse.C
 		}
 		j++
 	}
-	recovery.AddRecord(player) //store player test
+	recovery.AddRecord(*player)
 	return CRW_Ok
 
 }
