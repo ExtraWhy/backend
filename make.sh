@@ -61,6 +61,8 @@ fi
 }
 
 go env -w GOPROXY=direct
+export GOSUMDB=sum.golang.org
+
 
 if [[ -z $1 ]]; then
 	defaults

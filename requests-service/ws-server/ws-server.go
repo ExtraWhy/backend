@@ -5,6 +5,7 @@ import (
 	"casino/game/models"
 	feresponse "casino/game/models"
 	playercache "casino/game/player-cache"
+	"casino/recovery"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -12,6 +13,7 @@ import (
 	"github.com/ExtraWhy/internal-libs/config"
 	"github.com/ExtraWhy/internal-libs/db"
 	"github.com/ExtraWhy/internal-libs/models/player"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -27,9 +29,10 @@ const (
 	CRW_Ok                   = 0
 	CRW_No_money             = 1
 	CRW_Db_err_write         = 2
-	CRW_Db_err_read          = 3
-	CRW_Db_no_players        = 4
-	CRW_Db_no_player_with_id = 5
+	CRW_Db_err_read          = 4
+	CRW_Db_no_players        = 8
+	CRW_Db_no_player_with_id = 16
+	CRW_No_Win               = 32
 	CRW_Unknown              = 0xff
 )
 
@@ -78,12 +81,6 @@ func (srv *WSServer) DoRun(conf *config.RequestService) error {
 		srv.dbiface.(*db.DBSqlConnection).CreatePlayersTable()
 	}
 
-	//srv.router.Use(cors.New(cors.Config{
-	//	AllowOrigins: []string{"http://localhost:3000"}, // Next.js frontend
-	//	AllowMethods: []string{"GET", "POST", "OPTIONS"},
-	//	AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
-	//}))
-
 	srv.router.GET("/ws", func(c *gin.Context) {
 		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
@@ -117,52 +114,50 @@ func (srv *WSServer) getPlayerPlayCleo(msg *models.MessageBet, fer *feresponse.C
 	if player == nil {
 		return CRW_Db_no_player_with_id
 	}
-	if resp, err := crwcleopatra.GetWinForCleopatra(msg); err != nil {
-		return CRW_Unknown
-	} else {
-		var j = 0
-		for x := 0; x < 5; x++ {
-			for y := 0; y < 3; y++ {
-				fer.Scr[x][y] = resp.Syms[x*3+y]
-			}
+	resp := crwcleopatra.GetWinForCleopatra(msg)
+	var j = 0
+	for x := 0; x < 5; x++ {
+		for y := 0; y < 3; y++ {
+			fer.Scr[x][y] = resp.Syms[x*3+y]
 		}
-
-		//todo sym the win response and decide the player to display in the most recent played
-		if len(resp.Wins) > 0 {
-			playercache.PutToCache(player)
-		}
-		fer.Cleo = make([]feresponse.CRW_Fe_resp_cleo, len(resp.Wins))
-		for i := range resp.Wins {
-
-			fer.Cleo[j].XY = make([]uint32, 1)
-			fer.Cleo[j].BID = resp.Wins[i].BID
-
-			fer.Cleo[j].Free = resp.Wins[i].Free
-
-			fer.Cleo[j].JID = resp.Wins[i].JID
-
-			fer.Cleo[j].Jack = resp.Wins[i].Jack
-
-			fer.Cleo[j].Line = resp.Wins[i].Line
-
-			fer.Cleo[j].Mult = resp.Wins[i].Mult
-
-			fer.Cleo[j].Pay = resp.Wins[i].Pay
-
-			fer.Cleo[j].Sym = resp.Wins[i].Sym
-
-			fer.Cleo[j].Num = resp.Wins[i].Num
-
-			if resp.Wins[i].Linex != nil {
-				for k := 0; k < len(*&resp.Wins[i].Linex); k++ {
-					fer.Cleo[j].XY = append(fer.Cleo[j].XY, *&resp.Wins[i].Linex[k])
-				}
-			}
-			j++
-		}
-
-		return CRW_Ok
 	}
+
+	//todo sym the win response and decide the player to display in the most recent played
+	if len(resp.Wins) > 0 {
+		playercache.PutToCache(player)
+	}
+	fer.Cleo = make([]feresponse.CRW_Fe_resp_cleo, len(resp.Wins))
+	var freegames uint64 = 0
+	for i := range resp.Wins {
+
+		fer.Cleo[j].XY = make([]uint32, 1)
+		fer.Cleo[j].BID = resp.Wins[i].BID
+
+		fer.Cleo[j].Free = resp.Wins[i].Free
+		freegames += uint64(resp.Wins[i].Free)
+		fer.Cleo[j].JID = resp.Wins[i].JID
+
+		fer.Cleo[j].Jack = resp.Wins[i].Jack
+
+		fer.Cleo[j].Line = resp.Wins[i].Line
+
+		fer.Cleo[j].Mult = resp.Wins[i].Mult
+
+		fer.Cleo[j].Pay = resp.Wins[i].Pay
+
+		fer.Cleo[j].Sym = resp.Wins[i].Sym
+
+		fer.Cleo[j].Num = resp.Wins[i].Num
+
+		if resp.Wins[i].Linex != nil {
+			for k := 0; k < len(*&resp.Wins[i].Linex); k++ {
+				fer.Cleo[j].XY = append(fer.Cleo[j].XY, *&resp.Wins[i].Linex[k])
+			}
+		}
+		j++
+	}
+	recovery.AddRecord(*player) //this is a prototype if needed to be added here
+	return CRW_Ok
 
 }
 
@@ -185,7 +180,6 @@ func (srv *WSServer) getWinners(ctx *gin.Context) {
 		return
 	}
 	ctx.IndentedJSON(http.StatusNoContent, gin.H{"message": "No 5 winners present"})
-
 }
 
 func (srv *WSServer) getPlayerById(ctx *gin.Context) {

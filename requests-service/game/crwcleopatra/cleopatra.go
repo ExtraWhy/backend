@@ -1,51 +1,26 @@
 package crwcleopatra
 
 import (
-	"casino/game/bitvector"
 	models "casino/game/models"
 	"casino/game/slots"
-	"errors"
-	"fmt"
 	"sync"
-
-	"github.com/ExtraWhy/internal-libs/models/games"
 )
 
-var gameMode *games.Game
 var (
-	bvec  *bitvector.Bitvector
-	once  sync.Once
-	once1 sync.Once
-	cleo  *Game = NewGame()
+	once sync.Once
+	cleo *Game = NewGame()
 )
 
 func set20Lines() {
-	once1.Do(func() {
+	once.Do(func() {
 		cleo.SetSel(20)
 	})
-}
-
-func bvecInst() *bitvector.Bitvector {
-	once.Do(func() {
-		bvec = &bitvector.Bitvector{}
-		bvec.NewBitvector(1)
-	})
-	return bvec
-}
-
-func SetupGame(b bool) {
-	if b {
-		gameMode = &games.GameTest
-	} else {
-		gameMode = &games.Game1
-	}
 }
 
 func CleopatraSpinV2(bet uint64) (*slots.Wins, *Game) {
 	set20Lines()
 	var wins slots.Wins
 	var n = 0
-
 	cleo.Prepare()
 	cleo.SetBet(float64(bet))
 	for { // repeat until get valid screen
@@ -66,7 +41,7 @@ func CleopatraSpinV2(bet uint64) (*slots.Wins, *Game) {
 	return &wins, cleo
 }
 
-func GetWinForCleopatra(msg *models.MessageBet) (*models.CleopatraWins, error) {
+func GetWinForCleopatra(msg *models.MessageBet) *models.CleopatraWins {
 
 	retwins := models.CleopatraWins{}
 	retwins.Wins = make([]models.CleopatraWin, 1)
@@ -106,14 +81,5 @@ func GetWinForCleopatra(msg *models.MessageBet) (*models.CleopatraWins, error) {
 
 	}
 	wins.Reset() //reset the wins
-	return &retwins, nil
-}
-
-func SendWin4Cleo(msg *models.MessageBet) (*models.CleopatraWins, error) {
-	cleoresp, err := GetWinForCleopatra(msg) //IVZ
-	if err != nil {
-		return nil, errors.New(fmt.Sprint("could not greet: %v", err))
-	}
-
-	return cleoresp, nil
+	return &retwins
 }
