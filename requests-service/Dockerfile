@@ -11,6 +11,7 @@ ADD game/util game/util
 ADD rest-server/ rest-server
 ADD serv-interface/ serv-interface
 ADD ws-server/ ws-server
+ADD recovery/ recovery
 
 COPY go.mod go.sum requests-service.yaml main.go ./
 RUN go mod download
