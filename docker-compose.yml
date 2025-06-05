@@ -10,15 +10,16 @@ services:
     networks:
       - backend
     ports:
-      - "8080:8080" # REST API service port
+      - "8080" # REST API service port
     environment:
       - USER_SERVICE_ENV=production # Example environment variable
     deploy:
       resources:
         limits:
-          memory: 100m # Limit memory usage for the service
+          cpus: '0.1'
+          memory: 10m
         reservations:
-          memory: 50m # Reserve memory for the service
+          memory: 6m
 
   request-service:
     build:
@@ -27,8 +28,8 @@ services:
     networks:
       - backend
     ports:
-      - "8081:8081" # REST API service port
-      - "8082:8082" # WebSocket service port
+      - "8081" # REST API service port
+      - "8082" # WebSocket service port
     environment:
       - REQUEST_SERVICE_ENV=production # Example environment variable
     depends_on:
@@ -36,7 +37,30 @@ services:
     deploy:
       resources:
         limits:
-          memory: 100m # Limit memory usage for the service
+          cpus: '0.4'
+          memory: 15m
         reservations:
-          memory: 50m # Reserve memory for the service
+          memory: 10m
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    networks:
+      - backend
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+      - "8082:8082"
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro # Mount custom Nginx configuration
+    depends_on:
+      - user-service
+      - request-service
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 6m
+        reservations:
+          memory: 6m
 
